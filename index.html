@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Dashboard - Farmacia HUNSC Sur</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/styles.css"/>
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 24px;
+    }
+
+    .iridescent-border {
+      position: relative;
+      z-index: 1;
+    }
+
+    .iridescent-border::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 1rem;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--brand-accent), var(--brand-primary));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: -1;
+      opacity: 0.6;
+    }
+  </style>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "brand-primary": "#5A0E6E",
+            "brand-secondary": "#7B2D8E",
+            "brand-accent": "#AF9100",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101c22",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "1.5rem",
+            "xl": "2rem",
+            "full": "9999px",
+            "2xl": "1rem"
+          },
+        },
+      },
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    :root {
+      --brand-primary: #5A0E6E;
+      --brand-secondary: #7B2D8E;
+      --brand-accent: #AF9100;
+    }
+  </style>
+
+  <style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark">
+  <div class="relative min-h-screen w-full overflow-hidden">
+    <!-- Fondo animado -->
+    <div class="absolute inset-0 -z-10 h-full w-full bg-background-light dark:bg-background-dark">
+      <div class="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-brand-primary/20 opacity-50 blur-[80px]"></div>
+      <div class="absolute -bottom-1/4 -left-1/4 h-[500px] w-[500px] rounded-full bg-brand-accent/20 opacity-50 blur-[80px]"></div>
+    </div>
+
+    <div class="relative flex h-full min-h-screen w-full flex-col group/design-root">
+      <!-- Header -->
+      <div class="flex flex-col gap-2 p-4 pb-2">
+        <div class="flex h-12 items-center justify-between">
+          <div class="flex size-12 shrink-0 items-center">
+            <div class="aspect-square size-10 rounded-full bg-cover bg-center bg-no-repeat" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBZt4Nm0e0JIQOuo1ZsemtUMkDvFxMX2iygpp3qAi8QunlDpQpn7SJclGzlAb9_0Ox67BzGi44sZve1z8onpZGZIdVXNPCI-VclZZJxJ4KqjuGf355qpSDRxrZ1BQZJjnfjcPMot008UX_MvOnU0X04BES4ARioZvO8Jazd2X5DFnX28dhdz8ST27GJ9ZdeBZN1DMgFo_gRQbf64FTHL3-LbX1B6cTO33kxk5eiFfQyt6R5OUMiYDlrjM11NmggbEXrqz6FCEaTkhOo");'></div>
+          </div>
+          <div class="flex items-center">
+            <img alt="Logo Farmacia HUNSC" class="h-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzXkM_KUIOVVzeh5BDrH0HGTRPK27fkJTpzIqn5RXWhdp87qhApwz1viConktm7xbXWaCTWuXltnNbgZLiFHmYTE__WlVCOodGkOlNH_gYPo0mQlR9zgrkT44mOSvP8D379ZIbUEX6ipHWIEXB487rhFh9MgbLSRjPAc7KvD5bHD7wJtdlQDJRNDVF2Gho-R7rlEkhXjfFgeONiapM-AGKnFgo9HjNnFOfEnUyn0Emc0DLvBq-PvoFKj-zscz2MfUZle7t_5GYthAp"/>
+          </div>
+          <div class="flex w-12 items-center justify-end">
+            <button class="flex min-w-0 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full bg-transparent p-0 text-base font-bold leading-normal tracking-[0.015em] text-slate-800 dark:text-slate-200 h-12">
+              <span class="material-symbols-outlined">notifications</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="text-slate-900 dark:text-white tracking-light text-[32px] font-bold leading-tight px-4 text-left pb-3 pt-2">Tu día, María</h1>
+
+      <!-- Asignación actual -->
+      <div class="flex flex-col gap-4 p-4">
+        <div class="iridescent-border flex flex-col gap-4 rounded-2xl p-4 shadow-xl backdrop-blur-md bg-white/20 dark:bg-white/10 transition-transform duration-200 hover:scale-105">
+          <div class="flex items-center gap-3">
+            <div class="flex shrink-0 items-center justify-center rounded-full size-12 bg-brand-accent/20 text-brand-accent">
+              <span class="material-symbols-outlined">work</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-semibold leading-normal text-slate-800 dark:text-slate-100">Dispensación Urgencias</p>
+              <p class="text-sm font-normal leading-normal text-slate-600 dark:text-slate-300">Hoy, 15:00 - 22:00</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex shrink-0 items-center justify-center rounded-full size-12 bg-brand-primary/20 text-brand-primary">
+              <span class="material-symbols-outlined">location_on</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-semibold leading-normal text-slate-800 dark:text-slate-100">Área Principal</p>
+              <p class="text-sm font-normal leading-normal text-slate-600 dark:text-slate-300">Planta 0, Sector B</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex shrink-0 items-center justify-center rounded-full size-12 bg-amber-500/20 text-amber-500">
+              <span class="material-symbols-outlined">verified</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-semibold leading-normal text-slate-800 dark:text-slate-100">Validación Requerida</p>
+              <p class="text-sm font-normal leading-normal text-slate-600 dark:text-slate-300">Requiere supervisión</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de resumen -->
+      <div class="grid grid-cols-2 gap-4 px-4">
+        <div class="iridescent-border flex flex-col gap-2 rounded-2xl p-4 shadow-xl backdrop-blur-md bg-white/20 dark:bg-white/10 transition-transform duration-200 hover:scale-105">
+          <p class="text-sm font-medium leading-normal text-slate-800 dark:text-slate-200">Próxima Guardia</p>
+          <p class="tracking-light text-xl font-bold leading-tight text-brand-primary dark:text-brand-accent">25 Dic</p>
+          <p class="text-xs font-normal text-slate-600 dark:text-slate-300">08:00 - 15:00</p>
+        </div>
+        <div class="iridescent-border flex flex-col gap-2 rounded-2xl p-4 shadow-xl backdrop-blur-md bg-white/20 dark:bg-white/10 transition-transform duration-200 hover:scale-105">
+          <p class="text-sm font-medium leading-normal text-slate-800 dark:text-slate-200">Próximas Asign.</p>
+          <p class="tracking-light text-xl font-bold leading-tight text-brand-primary dark:text-brand-accent">5</p>
+          <p class="text-xs font-normal text-slate-600 dark:text-slate-300">Esta semana</p>
+        </div>
+      </div>
+
+      <!-- Resumen de asignaciones -->
+      <div class="flex items-center justify-between px-4 pb-2 pt-6">
+        <h3 class="text-xl font-bold leading-tight tracking-[-0.015em] text-slate-900 dark:text-white">Resumen de Asignaciones</h3>
+        <a class="text-sm font-semibold text-brand-primary dark:text-brand-accent" href="pages/asignaciones.html">Ver todo</a>
+      </div>
+
+      <div class="flex flex-col gap-3 px-4">
+        <div class="iridescent-border flex min-h-[72px] items-center gap-4 rounded-2xl p-4 shadow-xl backdrop-blur-md bg-white/20 dark:bg-white/10 transition-transform duration-200 hover:scale-105">
+          <div class="flex shrink-0 items-center justify-center rounded-full size-12 bg-brand-primary/20 text-brand-primary">
+            <span class="material-symbols-outlined">medication</span>
+          </div>
+          <div class="flex flex-col justify-center">
+            <p class="text-base font-semibold leading-normal text-slate-800 dark:text-slate-100 line-clamp-1">Mañana, 08:00 - 15:00</p>
+            <p class="text-sm font-normal leading-normal text-slate-600 dark:text-slate-300 line-clamp-2">Planta 3 - Cardiología</p>
+          </div>
+        </div>
+        <div class="iridescent-border flex min-h-[72px] items-center gap-4 rounded-2xl p-4 shadow-xl backdrop-blur-md bg-white/20 dark:bg-white/10 transition-transform duration-200 hover:scale-105">
+          <div class="flex shrink-0 items-center justify-center rounded-full size-12 bg-brand-primary/20 text-brand-primary">
+            <span class="material-symbols-outlined">science</span>
+          </div>
+          <div class="flex flex-col justify-center">
+            <p class="text-base font-semibold leading-normal text-slate-800 dark:text-slate-100 line-clamp-1">25 Dic, 08:00 - 15:00</p>
+            <p class="text-sm font-normal leading-normal text-slate-600 dark:text-slate-300 line-clamp-2">Laboratorio Fórmulas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-grow"></div>
+
+      <!-- Navegación inferior -->
+      <div class="sticky bottom-0 mt-8 w-full bg-white/50 p-2 backdrop-blur-lg dark:bg-black/50">
+        <div class="mx-auto flex w-full max-w-md items-center justify-around rounded-full bg-background-light px-2 py-2 shadow-lg dark:bg-background-dark/80">
+          <a href="index.html" class="flex flex-col items-center gap-1 p-2 text-brand-primary dark:text-brand-accent">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="text-[10px] font-bold">Dashboard</span>
+          </a>
+          <a href="pages/vacaciones.html" class="flex flex-col items-center gap-1 p-2 text-slate-500 dark:text-slate-400">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span class="text-[10px] font-medium">Vacaciones</span>
+          </a>
+          <a href="pages/empleados.html" class="flex flex-col items-center gap-1 p-2 text-slate-500 dark:text-slate-400">
+            <span class="material-symbols-outlined">group</span>
+            <span class="text-[10px] font-medium">Empleados</span>
+          </a>
+          <a href="pages/perfil.html" class="flex flex-col items-center gap-1 p-2 text-slate-500 dark:text-slate-400">
+            <span class="material-symbols-outlined">account_circle</span>
+            <span class="text-[10px] font-medium">Perfil</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

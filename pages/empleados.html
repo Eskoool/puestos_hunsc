@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Gestión de Empleados - Farmacia HUNSC Sur</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/styles.css"/>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5A0E6E",
+            "secondary": "#AF9100",
+            "accent": "#D4AF37",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101c22",
+            "glass-light": "rgba(255, 255, 255, 0.5)",
+            "glass-dark": "rgba(255, 255, 255, 0.1)",
+            "glass-light-hover": "rgba(255, 255, 255, 0.7)",
+            "glass-dark-hover": "rgba(255, 255, 255, 0.2)"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          boxShadow: {
+            'primary-focus': '0 0 0 2px var(--tw-bg-opacity, 1) rgba(90, 14, 110, 0.4)',
+          }
+        },
+      },
+    }
+  </script>
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark">
+  <div class="relative min-h-screen w-full overflow-x-hidden">
+    <!-- Fondo animado -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+      <div class="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-0 -right-1/4 w-1/2 h-1/2 bg-accent/20 dark:bg-accent/30 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative z-10 flex flex-col h-full">
+      <!-- Header -->
+      <header class="flex flex-col gap-2 p-4 pb-2">
+        <div class="flex h-12 items-center justify-between">
+          <a href="../index.html" class="material-symbols-outlined text-3xl text-gray-800 dark:text-gray-200">arrow_back</a>
+          <img alt="Farmacia HUNSC Logo" class="h-10 dark:brightness-150 dark:contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzwwkBgNuANoUYAik1A6vST-DWlKOSiqEySVCPKkMqc1VOaPGVp5CvQvO5c8u6VXT7u6k3SvX2jaq4QQX44Dni4TEIOvGuhQ-u2lLM8AJoySZEdAhWgKeZ8gBaORmIeRRryoySlblMEnK_XOeJZSkDTU5jodYSH6LXb7mHbu8r2wYWJ81U1Lnhrnfj2AR5RKdInpf54y-iBQzju2E93ISNnttpaKRr76Me6O_7lRkB17Z3ugfKtXmPHkxLO4-bnS9jTBMzK79Gu106"/>
+          <span class="material-symbols-outlined text-3xl text-gray-800 dark:text-gray-200">more_vert</span>
+        </div>
+        <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">Gestión de Empleados</h1>
+        <p class="text-gray-500 dark:text-gray-400">Farmacia del Hospital La Candelaria y Sur</p>
+      </header>
+
+      <!-- Barra de búsqueda -->
+      <div class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-lg px-4 pt-4 pb-2">
+        <div class="relative group">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 z-10 pointer-events-none group-focus-within:text-primary dark:group-focus-within:text-accent transition-colors">search</span>
+          <input class="peer form-input h-14 w-full rounded-full border-none bg-glass-light dark:bg-glass-dark pl-12 pr-4 text-base font-normal text-gray-900 dark:text-white placeholder-transparent focus:outline-0 focus:ring-2 focus:ring-primary dark:focus:ring-accent focus:ring-inset" id="search-employee" placeholder="Buscar empleado por nombre..." type="text"/>
+          <label class="absolute left-12 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:-top-0 peer-focus:text-xs peer-focus:text-primary dark:peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary dark:peer-[:not(:placeholder-shown)]:text-accent pointer-events-none bg-background-light dark:bg-background-dark px-1 rounded" for="search-employee">Buscar empleado por nombre...</label>
+        </div>
+      </div>
+
+      <!-- Lista de empleados -->
+      <main class="flex flex-col gap-3 p-4">
+        <div class="group flex cursor-pointer items-center justify-between gap-4 rounded-lg bg-glass-light dark:bg-glass-dark p-3 backdrop-blur-sm transition-all hover:bg-glass-light-hover dark:hover:bg-glass-dark-hover focus-within:ring-2 focus-within:ring-primary dark:focus-within:ring-accent">
+          <div class="flex items-center gap-4">
+            <img class="h-14 w-14 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKcxXJ0Vv5sAbJssDPgvEKn4I1b0IJ-Ip5OhDGYYw1pGuYwngNtRoWg-USkuAzwyAHqtdHv-5iTmXD_BZDIxZBvqDUNwSH72a7v0MJuKNlwnQ4J1HtQLEyrB5bzwYcnj2TuNYIAcaPMbRo6w8akD3h_TcKmxqUNwWcIEPNEOmC8DO8pNa1TlqmZhFN7AWUcChCvPw3mhBtQzgH0_fLK7N6Pp30rDCgkA1yeLLanDZgLRt4pVHquAeAmy8V-WxulVJnaJsqPEoxxeWx"/>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-medium leading-normal text-gray-900 dark:text-white">Ana Pérez García</p>
+              <p class="text-sm font-normal leading-normal text-gray-600 dark:text-gray-300">Farmacéutica Adjunta</p>
+            </div>
+          </div>
+          <div class="shrink-0">
+            <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-primary dark:group-hover:text-accent">chevron_right</span>
+          </div>
+        </div>
+
+        <div class="group flex cursor-pointer items-center justify-between gap-4 rounded-lg bg-glass-light dark:bg-glass-dark p-3 backdrop-blur-sm transition-all hover:bg-glass-light-hover dark:hover:bg-glass-dark-hover focus-within:ring-2 focus-within:ring-primary dark:focus-within:ring-accent">
+          <div class="flex items-center gap-4">
+            <img class="h-14 w-14 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0Edi8pih2GyECwimRH89FeVlPa2hezMz99SmXdrE2bHNQ3Ae9FPhqqanglLZlLGoiDbaS5abHArR3waKfZ1ssKAAyGyTSnBpZqfGLNkq35R3Pca3-_xpYeM1kxYdVV8PCjZStANadEv2wX8vMGjYGNggzLrIw_swVeFqY6FmJ2lPwQuKp7zLt1UL1GfOlDp0CFUC-2iYCjaVak5e3KApBEnTC0k1S9sOnhuUPA_veQ_U8w28GGu7LEq-3O4ttnNTZtXraY1XFyE5"/>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-medium leading-normal text-gray-900 dark:text-white">Juan Rodríguez López</p>
+              <p class="text-sm font-normal leading-normal text-gray-600 dark:text-gray-300">Técnico de Farmacia</p>
+            </div>
+          </div>
+          <div class="shrink-0">
+            <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-primary dark:group-hover:text-accent">chevron_right</span>
+          </div>
+        </div>
+
+        <div class="group flex cursor-pointer items-center justify-between gap-4 rounded-lg bg-glass-light dark:bg-glass-dark p-3 backdrop-blur-sm transition-all hover:bg-glass-light-hover dark:hover:bg-glass-dark-hover focus-within:ring-2 focus-within:ring-primary dark:focus-within:ring-accent">
+          <div class="flex items-center gap-4">
+            <img class="h-14 w-14 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMy3jkAR_XprfClLjZNXa1mWZCVbdtAt7BB7QroDSagGOy3TD15buDYKjbATD5tCcEkvqU2ZsZQlGPVLOV1Nn9XZ0EqEUMkj4BRGSCIFCqfZyVxBtMJ9Egm-E6nxWHCtuc6zVAX7bjrNHvnopfqUYm5Jz3fVlD3mQHzVWK0HjaDwQfj9jTnIDv19TT-njxO0u_kZNOSNh2G-T1dvTU4JkhQZoT_0FijE6PvUBZf3XBsj1-VUHIokYYJDYKBQ-szEH11BX7QECLVazY"/>
+            <div class="flex flex-col justify-center">
+              <p class="text-base font-medium leading-normal text-gray-900 dark:text-white">María Fernández Sanz</p>
+              <p class="text-sm font-normal leading-normal text-gray-600 dark:text-gray-300">Farmacéutica Residente</p>
+            </div>
+          </div>
+          <div class="shrink-0">
+            <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 transition-transform group-hover:translate-x-1 group-hover:text-primary dark:group-hover:text-accent">chevron_right</span>
+          </div>
+        </div>
+
+        <!-- Botón flotante para agregar empleado -->
+        <div class="fixed bottom-6 right-6 z-30">
+          <button class="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 transition-transform hover:scale-105 active:scale-95">
+            <span class="material-symbols-outlined text-3xl">add</span>
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

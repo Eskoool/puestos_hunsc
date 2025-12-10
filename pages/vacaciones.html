@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Vacaciones y Guardias - Farmacia HUNSC Sur</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/styles.css"/>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5A0E6E",
+            "secondary": "#AF9100",
+            "tertiary": "#D4AF37",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101c22",
+            "status-approved": "#5A0E6E",
+            "status-pending": "#AF9100",
+            "status-rejected": "#993333"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "1.5rem",
+            "xl": "2rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    .glass-card {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glass-card {
+      background-color: rgba(26, 38, 47, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .iridescent-border {
+      position: relative;
+      z-index: 1;
+    }
+    .iridescent-border::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 1.5rem;
+      padding: 1px;
+      background: var(--border-gradient);
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: -1;
+    }
+    .vacaciones-border {
+      --border-gradient: linear-gradient(135deg, rgba(90, 14, 110, 0.7), rgba(90, 14, 110, 0.2), rgba(255, 255, 255, 0.5));
+    }
+    .guardia-border {
+      --border-gradient: linear-gradient(135deg, rgba(175, 145, 0, 0.7), rgba(175, 145, 0, 0.2), rgba(255, 255, 255, 0.5));
+    }
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
+  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+
+    <!-- Header -->
+    <div class="flex items-center p-4 pb-2 justify-between">
+      <div class="flex size-12 shrink-0 items-center justify-start">
+        <a href="../index.html">
+          <img class="size-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvoEjz6rh1XARmE4qjgceA2XWgy_RWK8_nh97Czbg0G7DC9C83nzysS97gxnqqWE_ohuCqXS3PldhdL4R4As76M-PpYqUbVUyuKOBl0ay2bYTuSE6Lhfhydaw-GGN9YlzhC3al8Qy2ElytjTUn9UZEmo8-ORpideCM0ZV_O3yt7ef-mQZwfgD3zSHBoQjlKX-5rMdz-DyBqMSMkjnwALg8IZNk_cagYXep17DylalRUs05vaD_c_tiFJ0mSs16oYyRqk75iXvxC5LJ"/>
+        </a>
+      </div>
+      <h1 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Vacaciones y Guardias</h1>
+      <div class="flex size-12 shrink-0 items-center justify-end">
+        <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">notifications</span>
+      </div>
+    </div>
+
+    <!-- Toggle Principal -->
+    <div class="flex px-4 py-3">
+      <div class="flex h-12 flex-1 items-center justify-center rounded-full bg-slate-200 dark:bg-background-dark/80 p-1 shadow-inner">
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Solicitar</span>
+          <input checked class="invisible w-0" name="view-toggle" type="radio" value="Solicitar"/>
+        </label>
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Mis Solicitudes</span>
+          <input class="invisible w-0" name="view-toggle" type="radio" value="Mis Solicitudes"/>
+        </label>
+      </div>
+    </div>
+
+    <!-- Toggle de tipo de solicitud -->
+    <div class="px-4 py-2">
+      <div class="flex h-12 w-full items-center justify-center rounded-full bg-slate-200 dark:bg-background-dark/80 p-1 shadow-inner">
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Vacaciones</span>
+          <input checked class="invisible w-0" name="request-type" type="radio" value="Vacaciones"/>
+        </label>
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-secondary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-secondary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Cambio de Guardia</span>
+          <input class="invisible w-0" name="request-type" type="radio" value="Cambio de Guardia"/>
+        </label>
+      </div>
+    </div>
+
+    <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Nueva Solicitud de Vacaciones</h2>
+
+    <!-- Calendario -->
+    <div class="flex flex-wrap items-center justify-center gap-6 px-4">
+      <div class="flex min-w-72 max-w-full flex-1 flex-col gap-0.5">
+        <div class="flex items-center p-1 justify-between">
+          <button class="flex size-10 items-center justify-center text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <p class="text-slate-900 dark:text-white text-base font-bold leading-tight flex-1 text-center">Diciembre 2024</p>
+          <button class="flex size-10 items-center justify-center text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+        <div class="grid grid-cols-7 gap-y-1">
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">L</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">M</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">X</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">J</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">V</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">S</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">D</p>
+
+          <button class="h-12 w-full text-slate-400 dark:text-slate-600 col-start-7 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">1</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">2</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">3</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">4</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">5</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">6</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">7</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">8</div></button>
+          <button class="h-12 w-full text-white rounded-l-full bg-primary/20 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full bg-primary">9</div></button>
+          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">10</div></button>
+          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">11</div></button>
+          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">12</div></button>
+          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">13</div></button>
+          <button class="h-12 w-full text-white rounded-r-full bg-primary/20 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full bg-primary">14</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">15</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">16</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">17</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">18</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">19</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">20</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">21</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">22</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">23</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">24</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">25</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">26</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">27</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">28</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">29</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">30</div></button>
+          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">31</div></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de fechas -->
+    <div class="flex w-full flex-wrap items-end gap-4 px-4 py-3">
+      <label class="flex flex-col min-w-40 flex-1 relative">
+        <span class="text-xs font-medium text-primary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Fecha de Inicio</span>
+        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-slate-300 dark:border-slate-600 bg-transparent h-14 placeholder:text-slate-400 p-4 text-base font-normal leading-normal" value="09/12/2024"/>
+      </label>
+      <label class="flex flex-col min-w-40 flex-1 relative">
+        <span class="text-xs font-medium text-primary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Fecha de Fin</span>
+        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-slate-300 dark:border-slate-600 bg-transparent h-14 placeholder:text-slate-400 p-4 text-base font-normal leading-normal" value="14/12/2024"/>
+      </label>
+    </div>
+
+    <!-- Comentarios -->
+    <div class="px-4 py-2">
+      <label class="flex flex-col w-full relative">
+        <span class="text-xs font-medium text-primary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Comentarios (opcional)</span>
+        <textarea class="form-textarea w-full resize-none rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-slate-300 dark:border-slate-600 bg-transparent p-4 placeholder:text-slate-400" placeholder="Añadir un comentario..." rows="3"></textarea>
+      </label>
+    </div>
+
+    <!-- Botón de envío -->
+    <div class="px-4 py-4">
+      <button class="flex w-full items-center justify-center rounded-full bg-primary h-14 text-white text-base font-bold leading-normal shadow-lg shadow-primary/30">Enviar Solicitud</button>
+    </div>
+
+    <!-- Historial de solicitudes -->
+    <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Historial de Solicitudes</h2>
+
+    <div class="flex flex-col gap-4 px-4 pb-8">
+      <!-- Solicitud Aprobada -->
+      <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-primary">Vacaciones</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">12/11/2024 - 18/11/2024</p>
+            <p class="text-lg font-bold text-slate-800 dark:text-slate-100">7 días</p>
+          </div>
+          <div class="flex items-center gap-2 rounded-full bg-status-approved/10 px-3 py-1 text-sm font-medium text-status-approved dark:text-primary">
+            <span class="material-symbols-outlined text-base">check_circle</span>
+            <span>Aprobado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solicitud Pendiente -->
+      <div class="glass-card iridescent-border guardia-border rounded-lg p-4 flex flex-col gap-3">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-secondary">Cambio de Guardia</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Con Ana Pérez, 25/12/2024</p>
+            <p class="text-lg font-bold text-slate-800 dark:text-slate-100">Guardia de Noche</p>
+          </div>
+          <div class="flex items-center gap-2 rounded-full bg-status-pending/10 px-3 py-1 text-sm font-medium text-status-pending dark:text-secondary">
+            <span class="material-symbols-outlined text-base">hourglass_top</span>
+            <span>Pendiente</span>
+          </div>
+        </div>
+        <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> Asunto familiar importante.</p>
+        <div class="flex gap-3 pt-2">
+          <button class="flex-1 rounded-full h-10 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-sm">Cancelar</button>
+          <button class="flex-1 rounded-full h-10 bg-secondary/20 text-secondary font-semibold text-sm">Editar</button>
+        </div>
+      </div>
+
+      <!-- Solicitud Rechazada -->
+      <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-primary">Vacaciones</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">01/10/2024 - 03/10/2024</p>
+            <p class="text-lg font-bold text-slate-800 dark:text-slate-100">3 días</p>
+          </div>
+          <div class="flex items-center gap-2 rounded-full bg-status-rejected/10 px-3 py-1 text-sm font-medium text-status-rejected dark:text-status-rejected/80">
+            <span class="material-symbols-outlined text-base">cancel</span>
+            <span>Rechazado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

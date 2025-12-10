@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Perfil de Usuario - Farmacia HUNSC Sur</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/styles.css"/>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5A0E6E",
+            "secondary": "#AF9100",
+            "accent": "#D4AF37",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101c22",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      min-height: max(884px, 100dvh);
+      background: linear-gradient(170deg, #AF9100 0%, #5A0E6E 50%, #7B2D8E 100%);
+    }
+    .dark body {
+      background: linear-gradient(170deg, #101c22 0%, #1e293b 50%, #101c22 100%);
+    }
+  </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark">
+  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+    <!-- Header -->
+    <header class="flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4 sticky top-0 z-10">
+      <div class="flex size-12 shrink-0 items-center justify-start">
+        <a href="../index.html">
+          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCNXY89az7oPN15QUdV2RyNLXpjXo8DOJbnLX9NL4Xp6wEvFk4BC7THxUO0qxVrN1lJjIS78bAFIU2JZ-26kVYoL-q9KavrcK35Q3C5hF6QsKV4oBITKYc2Hi7lYbTfPNCGTFMSYmfhnotTwKtE2bE1Ye4dVsMMuK82l8I8rSjUwAJwKLsR8b7VDGnx4n5dJ0uDD2Zkf8M-CJ4pk-YpG5w3qIh_kg8luK3V7cFDcLESYw1lNeUt69dLa4ZQMkxYbchNC1hF_Td_yWkx");'></div>
+        </a>
+      </div>
+      <h1 class="text-[#0d171c] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Perfil</h1>
+      <div class="flex w-12 items-center justify-end">
+        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-[#0d171c] dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+          <span class="material-symbols-outlined text-2xl">settings</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="flex flex-col flex-1">
+      <!-- Sección de perfil -->
+      <section class="flex p-4 @container">
+        <div class="flex w-full flex-col gap-4 items-center">
+          <div class="flex gap-4 flex-col items-center">
+            <div class="w-48 h-24 mb-4">
+              <img alt="Farmacia HUNSC logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8cSiNi7hIr3KDIM29P79ZFxJJhxE716483hvYv5F-maCvJ9R6VmlTiEC54P6BysEBK8NqVZenyO6Y4baNgS636cVmE-yMwrM0XBtkQBqdJNknHZM6Gpa1JzRsfnrYabWGAyc89y0E5XaxcUFEjXrE6BggvTNWNY-an7tgIYz78pSVHicQqwujQBRQBvPv487oL5E4n2bG2J8sVN3HZeYc-DhlF38C7W9UTwwCaZ0_8DppfG2XWpE_bpNd5ycx3XY8yXHJlprLK0S_"/>
+            </div>
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEegCLvttwSPhRm688obFlYgFFyUMOp8wlrL6kZzQA6BvReLkj_zuQCErgft6YP5cwM3jRn2bwDVY8onTCbtJIAUwPsd9Wa05I8g1vUKwLHJ6fq8x68ENrq_JqqKUK7Hg8b-UeRgzKLhkwwnmDGgMI9V46dFhKrR07Ru8CQv6Ef-0Drf5XiUZ9JQwqj0rECINs0BXL3f1qcduTx4l7smNC4lbh_QkGzDj6H4WywtDWVWenR2hOBUo1-uBL0sdjXbTkZEnQEdyvwJd5");'></div>
+            <div class="flex flex-col items-center justify-center">
+              <p class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] text-center">Alejandro Martinez</p>
+              <p class="text-white/80 text-base font-medium leading-normal text-center">Técnico de Farmacia</p>
+            </div>
+          </div>
+          <div class="flex w-full max-w-[480px] gap-3 @[480px]:w-auto">
+            <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-white/10 dark:bg-white/10 backdrop-blur-md text-white dark:text-white text-sm font-bold leading-normal tracking-[0.015em] flex-1 @[480px]:flex-auto">
+              <span class="truncate">Solicitar Cambio</span>
+            </button>
+            <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-white/90 dark:bg-white/90 backdrop-blur-md text-primary dark:text-primary text-sm font-bold leading-normal tracking-[0.015em] flex-1 @[480px]:flex-auto">
+              <span class="truncate">Actualizar Preferencias</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Área asignada y estadísticas -->
+      <section class="flex flex-col gap-4 p-4">
+        <div class="flex w-full flex-col gap-2 rounded-lg p-6 border border-white/20 bg-black/10 backdrop-blur-md items-center">
+          <span class="material-symbols-outlined text-white/80 text-3xl">assignment_ind</span>
+          <p class="text-white/80 text-base font-medium leading-normal mt-1">Área Asignada</p>
+          <p class="text-white tracking-light text-2xl font-bold leading-tight">Dispensación Ambulatoria</p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+          <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-white/20 bg-black/10 backdrop-blur-md">
+            <p class="text-white/80 text-base font-medium leading-normal">Vacaciones</p>
+            <p class="text-white tracking-light text-2xl font-bold leading-tight">15</p>
+          </div>
+          <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-white/20 bg-black/10 backdrop-blur-md">
+            <p class="text-white/80 text-base font-medium leading-normal">Días Libres</p>
+            <p class="text-white tracking-light text-2xl font-bold leading-tight">2</p>
+          </div>
+          <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-white/20 bg-black/10 backdrop-blur-md">
+            <p class="text-white/80 text-base font-medium leading-normal">Asignaciones</p>
+            <p class="text-white tracking-light text-2xl font-bold leading-tight">89</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Toggle de contenido -->
+      <section class="flex px-4 py-3">
+        <div class="flex h-10 flex-1 items-center justify-center rounded-full bg-black/20 dark:bg-white/10 p-1 backdrop-blur-md">
+          <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:dark:bg-primary has-[:checked]:shadow-sm has-[:checked]:text-white has-[:checked]:dark:text-white text-white/80 dark:text-gray-300 text-sm font-medium leading-normal transition-colors duration-300">
+            <span class="truncate">Asignaciones</span>
+            <input checked class="invisible w-0" name="content-toggle" type="radio" value="Asignaciones"/>
+          </label>
+          <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:dark:bg-primary has-[:checked]:shadow-sm has-[:checked]:text-white has-[:checked]:dark:text-white text-white/80 dark:text-gray-300 text-sm font-medium leading-normal transition-colors duration-300">
+            <span class="truncate">Historial</span>
+            <input class="invisible w-0" name="content-toggle" type="radio" value="Historial"/>
+          </label>
+        </div>
+      </section>
+
+      <!-- Próximas asignaciones -->
+      <section class="flex flex-col px-4 pb-4">
+        <h2 class="text-lg font-semibold text-white mb-2">Próximas Asignaciones</h2>
+        <div class="flex items-center gap-4 bg-transparent min-h-[72px] py-2 justify-between">
+          <div class="flex items-center gap-4">
+            <div class="text-white flex items-center justify-center rounded-lg bg-accent/20 dark:bg-accent/30 shrink-0 size-12">
+              <span class="material-symbols-outlined text-accent">nights_stay</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-white text-base font-medium leading-normal line-clamp-1">Guardia de Noche</p>
+              <p class="text-white/70 text-sm font-normal leading-normal line-clamp-2">15 NOV 2024</p>
+            </div>
+          </div>
+          <div class="shrink-0"><p class="text-white/80 text-base font-normal leading-normal">Sede Sur</p></div>
+        </div>
+        <div class="flex items-center gap-4 bg-transparent min-h-[72px] py-2 justify-between">
+          <div class="flex items-center gap-4">
+            <div class="text-white flex items-center justify-center rounded-lg bg-secondary/20 dark:bg-secondary/30 shrink-0 size-12">
+              <span class="material-symbols-outlined text-secondary">light_mode</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-white text-base font-medium leading-normal line-clamp-1">Turno de Mañana</p>
+              <p class="text-white/70 text-sm font-normal leading-normal line-clamp-2">18 NOV 2024</p>
+            </div>
+          </div>
+          <div class="shrink-0"><p class="text-white/80 text-base font-normal leading-normal">Hospital Candelaria</p></div>
+        </div>
+        <div class="flex items-center gap-4 bg-transparent min-h-[72px] py-2 justify-between">
+          <div class="flex items-center gap-4">
+            <div class="text-white flex items-center justify-center rounded-lg bg-primary/20 dark:bg-primary/30 shrink-0 size-12">
+              <span class="material-symbols-outlined text-primary">pill</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-white text-base font-medium leading-normal line-clamp-1">Dispensación</p>
+              <p class="text-white/70 text-sm font-normal leading-normal line-clamp-2">21 NOV 2024</p>
+            </div>
+          </div>
+          <div class="shrink-0"><p class="text-white/80 text-base font-normal leading-normal">Sede Sur</p></div>
+        </div>
+        <div class="flex items-center gap-4 bg-transparent min-h-[72px] py-2 justify-between">
+          <div class="flex items-center gap-4">
+            <div class="text-white flex items-center justify-center rounded-lg bg-accent/20 dark:bg-accent/30 shrink-0 size-12">
+              <span class="material-symbols-outlined text-accent">nights_stay</span>
+            </div>
+            <div class="flex flex-col justify-center">
+              <p class="text-white text-base font-medium leading-normal line-clamp-1">Guardia de Noche</p>
+              <p class="text-white/70 text-sm font-normal leading-normal line-clamp-2">25 NOV 2024</p>
+            </div>
+          </div>
+          <div class="shrink-0"><p class="text-white/80 text-base font-normal leading-normal">Hospital Candelaria</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

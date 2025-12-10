@@ -1,0 +1,173 @@
+/*
+ * Farmacia HUNSC - Sistema de Gestión de Puestos
+ * Paleta de colores basada en el logo de la marca
+ */
+
+:root {
+  /* Colores principales del logo */
+  --primary-purple: #5A0E6E;        /* Púrpura del logo */
+  --primary-gold: #AF9100;          /* Oro/dorado del logo */
+  --accent-gold: #D4AF37;           /* Oro claro para acentos */
+  --secondary-purple: #7B2D8E;      /* Púrpura más claro */
+
+  /* Colores de estado */
+  --status-approved: #5A0E6E;       /* Aprobado - púrpura */
+  --status-pending: #AF9100;        /* Pendiente - oro */
+  --status-rejected: #993333;       /* Rechazado - rojo */
+
+  /* Colores adicionales */
+  --accent-teal: #38B2AC;           /* Turquesa para variedad */
+  --accent-blue: #04689E;           /* Azul para información */
+  --accent-green: #5EAF38;          /* Verde para éxito */
+
+  /* Fondos */
+  --background-light: #F5F7F8;      /* Fondo claro */
+  --background-dark: #101C22;       /* Fondo oscuro */
+
+  /* Texto */
+  --text-light: #1A202C;            /* Texto sobre fondo claro */
+  --text-dark: #F7FAFC;             /* Texto sobre fondo oscuro */
+
+  /* Glassmorphism */
+  --glass-light: rgba(255, 255, 255, 0.6);
+  --glass-dark: rgba(26, 38, 47, 0.6);
+  --glass-light-hover: rgba(255, 255, 255, 0.8);
+  --glass-dark-hover: rgba(26, 38, 47, 0.8);
+
+  /* Bordes */
+  --border-light: rgba(255, 255, 255, 0.2);
+  --border-dark: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Efectos de cristal (glassmorphism) */
+.glass-card {
+  background-color: var(--glass-light);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+}
+
+.dark .glass-card {
+  background-color: var(--glass-dark);
+  border: 1px solid var(--border-dark);
+}
+
+.glass-card:hover {
+  background-color: var(--glass-light-hover);
+}
+
+.dark .glass-card:hover {
+  background-color: var(--glass-dark-hover);
+}
+
+/* Bordes iridiscentes */
+.iridescent-border {
+  position: relative;
+  z-index: 1;
+}
+
+.iridescent-border::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--border-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+}
+
+.vacaciones-border {
+  --border-gradient: linear-gradient(135deg, rgba(90, 14, 110, 0.7), rgba(90, 14, 110, 0.2), rgba(255, 255, 255, 0.5));
+}
+
+.guardia-border {
+  --border-gradient: linear-gradient(135deg, rgba(175, 145, 0, 0.7), rgba(175, 145, 0, 0.2), rgba(255, 255, 255, 0.5));
+}
+
+/* Efectos de fondo animados */
+.animated-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-background::before,
+.animated-background::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: float 20s infinite ease-in-out;
+}
+
+.animated-background::before {
+  top: -25%;
+  left: -25%;
+  width: 50%;
+  height: 50%;
+  background: var(--primary-purple);
+  opacity: 0.2;
+}
+
+.animated-background::after {
+  bottom: -25%;
+  right: -25%;
+  width: 50%;
+  height: 50%;
+  background: var(--accent-gold);
+  opacity: 0.15;
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(10%, -10%) scale(1.1);
+  }
+  50% {
+    transform: translate(-10%, 10%) scale(0.9);
+  }
+  75% {
+    transform: translate(10%, 10%) scale(1.05);
+  }
+}
+
+/* Utilidades */
+.frosted-glass {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .frosted-glass {
+  background-color: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
