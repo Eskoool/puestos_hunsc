@@ -83,20 +83,27 @@
 </head>
 
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
-  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+  <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
 
-    <!-- Header -->
-    <div class="flex items-center p-4 pb-2 justify-between">
-      <div class="flex size-12 shrink-0 items-center justify-start">
-        <a href="../index.html">
-          <img class="size-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvoEjz6rh1XARmE4qjgceA2XWgy_RWK8_nh97Czbg0G7DC9C83nzysS97gxnqqWE_ohuCqXS3PldhdL4R4As76M-PpYqUbVUyuKOBl0ay2bYTuSE6Lhfhydaw-GGN9YlzhC3al8Qy2ElytjTUn9UZEmo8-ORpideCM0ZV_O3yt7ef-mQZwfgD3zSHBoQjlKX-5rMdz-DyBqMSMkjnwALg8IZNk_cagYXep17DylalRUs05vaD_c_tiFJ0mSs16oYyRqk75iXvxC5LJ"/>
-        </a>
-      </div>
-      <h1 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Vacaciones y Guardias</h1>
-      <div class="flex size-12 shrink-0 items-center justify-end">
-        <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">notifications</span>
+    <!-- Header con max-width responsive -->
+    <div class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+      <div class="mx-auto max-w-7xl">
+        <div class="flex items-center p-4 lg:p-6 pb-2 justify-between">
+          <div class="flex size-12 shrink-0 items-center justify-start">
+            <a href="../index.html">
+              <img class="size-10 lg:size-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvoEjz6rh1XARmE4qjgceA2XWgy_RWK8_nh97Czbg0G7DC9C83nzysS97gxnqqWE_ohuCqXS3PldhdL4R4As76M-PpYqUbVUyuKOBl0ay2bYTuSE6Lhfhydaw-GGN9YlzhC3al8Qy2ElytjTUn9UZEmo8-ORpideCM0ZV_O3yt7ef-mQZwfgD3zSHBoQjlKX-5rMdz-DyBqMSMkjnwALg8IZNk_cagYXep17DylalRUs05vaD_c_tiFJ0mSs16oYyRqk75iXvxC5LJ"/>
+            </a>
+          </div>
+          <h1 class="text-slate-900 dark:text-white text-lg lg:text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Vacaciones y Guardias</h1>
+          <div class="flex size-12 shrink-0 items-center justify-end">
+            <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">notifications</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Contenedor principal con max-width -->
+    <div class="mx-auto w-full max-w-7xl flex-1 pb-20 lg:pb-8">
 
     <!-- Toggle Principal -->
     <div class="flex px-4 py-3">
@@ -263,6 +270,7 @@
         </div>
       </div>
     </div>
+    </div><!-- Cierre contenedor max-w-7xl -->
   </div>
 </body>
 </html>
