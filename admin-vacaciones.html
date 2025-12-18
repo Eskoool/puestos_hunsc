@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Gestión de Vacaciones - Admin HUNSC</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "brand-primary": "#5A0E6E",
+            "brand-accent": "#AF9100",
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%); }
+    .card { background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    .gradient-purple { background: linear-gradient(135deg, #5A0E6E 0%, #7B2D8E 100%); }
+
+    /* Estado de solicitudes */
+    .request-pending { border-left: 4px solid #F59E0B; background: #FFFBEB; }
+    .request-approved { border-left: 4px solid #10B981; background: #ECFDF5; }
+    .request-denied { border-left: 4px solid #EF4444; background: #FEF2F2; }
+
+    /* Calendar styles */
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e5e7eb; }
+    .calendar-day { background: white; padding: 8px; min-height: 80px; font-size: 14px; }
+    .calendar-day.other-month { background: #f9fafb; color: #9ca3af; }
+    .calendar-day.has-vacation { background: #FEF3C7; border: 2px solid #F59E0B; }
+    .calendar-header { font-weight: 600; text-align: center; padding: 12px; background: #f3f4f6; }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-4">
+          <a href="admin-dashboard.html" class="material-symbols-outlined text-gray-600 hover:text-brand-primary">arrow_back</a>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900">Gestión de Vacaciones</h1>
+            <p class="text-sm text-gray-500">Aprobar o denegar solicitudes</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">8 pendientes</span>
+          <button class="gradient-purple text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 flex items-center gap-2">
+            <span class="material-symbols-outlined">download</span>
+            Exportar
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Filtros -->
+    <div class="card p-4 mb-6">
+      <div class="flex flex-wrap gap-3 items-center">
+        <button class="px-4 py-2 bg-brand-primary text-white rounded-lg font-semibold text-sm">
+          Todas (8)
+        </button>
+        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-200">
+          Pendientes (8)
+        </button>
+        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-200">
+          Aprobadas (24)
+        </button>
+        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-200">
+          Denegadas (2)
+        </button>
+        <div class="ml-auto flex gap-3">
+          <input type="date" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary"/>
+          <input type="text" placeholder="Buscar empleado..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout: Solicitudes + Vista Mensual -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- IZQUIERDA: Solicitudes Pendientes (2 columnas) -->
+      <div class="lg:col-span-2">
+        <div class="card p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Solicitudes Pendientes</h2>
+            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">8 solicitudes</span>
+          </div>
+
+          <div class="space-y-4 max-h-[700px] overflow-y-auto">
+
+            <!-- Solicitud 1 -->
+            <div class="request-pending rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <img class="w-14 h-14 rounded-full flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKcxXJ0Vv5sAbJssDPgvEKn4I1b0IJ-Ip5OhDGYYw1pGuYwngNtRoWg-USkuAzwyAHqtdHv-5iTmXD_BZDIxZBvqDUNwSH72a7v0MJuKNlwnQ4J1HtQLEyrB5bzwYcnj2TuNYIAcaPMbRo6w8akD3h_TcKmxqUNwWcIEPNEOmC8DO8pNa1TlqmZhFN7AWUcChCvPw3mhBtQzgH0_fLK7N6Pp30rDCgkA1yeLLanDZgLRt4pVHquAeAmy8V-WxulVJnaJsqPEoxxeWx"/>
+                <div class="flex-1">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-bold text-gray-900 text-lg">Ana Pérez García</h3>
+                      <p class="text-sm text-gray-600">Farmacéutica Adjunta • Dispensación</p>
+                    </div>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold">Pendiente</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-4">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">calendar_today</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Inicio</p>
+                        <p class="font-semibold text-sm">20 Dic 2024</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">event</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Fin</p>
+                        <p class="font-semibold text-sm">3 Ene 2025</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">schedule</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Duración</p>
+                        <p class="font-semibold text-sm">15 días</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg p-3 mb-4">
+                    <p class="text-sm text-gray-700"><strong>Motivo:</strong> Vacaciones de Navidad. Reunión familiar.</p>
+                    <p class="text-xs text-gray-500 mt-1">Solicitado hace 3 días</p>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <button class="flex-1 px-4 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-sm">check_circle</span>
+                      Aprobar
+                    </button>
+                    <button class="flex-1 px-4 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-sm">cancel</span>
+                      Denegar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Solicitud 2 -->
+            <div class="request-pending rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <img class="w-14 h-14 rounded-full flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0Edi8pih2GyECwimRH89FeVlPa2hezMz99SmXdrE2bHNQ3Ae9FPhqqanglLZlLGoiDbaS5abHArR3waKfZ1ssKAAyGyTSnBpZqfGLNkq35R3Pca3-_xpYeM1kxYdVV8PCjZStANadEv2wX8vMGjYGNggzLrIw_swVeFqY6FmJ2lPwQuKp7zLt1UL1GfOlDp0CFUC-2iYCjaVak5e3KApBEnTC0k1S9sOnhuUPA_veQ_U8w28GGu7LEq-3O4ttnNTZtXraY1XFyE5"/>
+                <div class="flex-1">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-bold text-gray-900 text-lg">Juan Rodríguez</h3>
+                      <p class="text-sm text-gray-600">Técnico de Farmacia • Unidosis</p>
+                    </div>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold">Pendiente</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-4">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">calendar_today</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Inicio</p>
+                        <p class="font-semibold text-sm">27 Dic 2024</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">event</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Fin</p>
+                        <p class="font-semibold text-sm">5 Ene 2025</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">schedule</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Duración</p>
+                        <p class="font-semibold text-sm">10 días</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg p-3 mb-4">
+                    <p class="text-sm text-gray-700"><strong>Motivo:</strong> Periodo libre. Asuntos personales.</p>
+                    <p class="text-xs text-gray-500 mt-1">Solicitado hace 1 día</p>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <button class="flex-1 px-4 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-sm">check_circle</span>
+                      Aprobar
+                    </button>
+                    <button class="flex-1 px-4 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-sm">cancel</span>
+                      Denegar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Solicitud 3 -->
+            <div class="request-pending rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <img class="w-14 h-14 rounded-full flex-shrink-0" src="https://via.placeholder.com/56"/>
+                <div class="flex-1">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-bold text-gray-900 text-lg">Laura Gómez</h3>
+                      <p class="text-sm text-gray-600">Farmacéutica • Nutrición Parenteral</p>
+                    </div>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold">Pendiente</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-4">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">calendar_today</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Inicio</p>
+                        <p class="font-semibold text-sm">15 Ene 2025</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">event</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Fin</p>
+                        <p class="font-semibold text-sm">29 Ene 2025</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">schedule</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Duración</p>
+                        <p class="font-semibold text-sm">15 días</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg p-3 mb-4">
+                    <p class="text-sm text-gray-700"><strong>Motivo:</strong> Vacaciones anuales.</p>
+                    <p class="text-xs text-gray-500 mt-1">Solicitado hace 5 días</p>
+                  </div>
+
+                  <div class="flex gap-3">
+                    <button class="flex-1 px-4 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-sm">check_circle</span>
+                      Aprobar
+                    </button>
+                    <button class="flex-1 px-4 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 flex items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-sm">cancel</span>
+                      Denegar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Solicitudes Aprobadas Recientes (para mostrar estado) -->
+            <div class="request-approved rounded-xl p-5">
+              <div class="flex items-start gap-4">
+                <img class="w-14 h-14 rounded-full flex-shrink-0" src="https://via.placeholder.com/56"/>
+                <div class="flex-1">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-bold text-gray-900 text-lg">Carlos Vega</h3>
+                      <p class="text-sm text-gray-600">Técnico Superior • Farmacotecnia</p>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">✓ Aprobada</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-4">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">calendar_today</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Inicio</p>
+                        <p class="font-semibold text-sm">1 Feb 2025</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">event</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Fecha Fin</p>
+                        <p class="font-semibold text-sm">10 Feb 2025</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-gray-500 text-sm">schedule</span>
+                      <div>
+                        <p class="text-xs text-gray-500">Duración</p>
+                        <p class="font-semibold text-sm">10 días</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg p-3">
+                    <p class="text-sm text-gray-700"><strong>Motivo:</strong> Vacaciones planificadas.</p>
+                    <p class="text-xs text-green-600 mt-1">✓ Aprobado por María González hace 2 horas</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- DERECHA: Vista Mensual de Calendario (1 columna) -->
+      <div class="lg:col-span-1">
+
+        <!-- Resumen Mensual -->
+        <div class="card p-6 mb-6">
+          <h3 class="font-bold text-gray-900 mb-4 text-lg">Resumen de Diciembre</h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-green-600">check_circle</span>
+                <span class="text-sm font-medium text-gray-700">Aprobadas</span>
+              </div>
+              <span class="text-xl font-bold text-green-600">6</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-600">pending</span>
+                <span class="text-sm font-medium text-gray-700">Pendientes</span>
+              </div>
+              <span class="text-xl font-bold text-amber-600">8</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-red-600">cancel</span>
+                <span class="text-sm font-medium text-gray-700">Denegadas</span>
+              </div>
+              <span class="text-xl font-bold text-red-600">1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Próximas Vacaciones -->
+        <div class="card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-900 text-lg">Próximas Vacaciones</h3>
+            <span class="material-symbols-outlined text-brand-primary">calendar_month</span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+              <p class="font-semibold text-sm text-gray-900">María Sanz</p>
+              <p class="text-xs text-gray-600">20 Dic - 3 Ene (15 días)</p>
+            </div>
+            <div class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+              <p class="font-semibold text-sm text-gray-900">Pedro Martín</p>
+              <p class="text-xs text-gray-600">22 Dic - 5 Ene (15 días)</p>
+            </div>
+            <div class="p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
+              <p class="font-semibold text-sm text-gray-900">Elena Ruiz</p>
+              <p class="text-xs text-gray-600">27 Dic - 2 Ene (7 días)</p>
+            </div>
+            <div class="p-3 bg-amber-50 rounded-lg border-l-4 border-amber-500">
+              <p class="font-semibold text-sm text-gray-900">Diego López</p>
+              <p class="text-xs text-gray-600">1 Ene - 10 Ene (10 días)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini Calendario -->
+        <div class="card p-6 mt-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-900">Diciembre 2024</h3>
+            <div class="flex gap-2">
+              <button class="p-1 hover:bg-gray-100 rounded">
+                <span class="material-symbols-outlined text-gray-600 text-sm">chevron_left</span>
+              </button>
+              <button class="p-1 hover:bg-gray-100 rounded">
+                <span class="material-symbols-outlined text-gray-600 text-sm">chevron_right</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="calendar-grid rounded-lg overflow-hidden">
+            <div class="calendar-header">L</div>
+            <div class="calendar-header">M</div>
+            <div class="calendar-header">X</div>
+            <div class="calendar-header">J</div>
+            <div class="calendar-header">V</div>
+            <div class="calendar-header">S</div>
+            <div class="calendar-header">D</div>
+
+            <div class="calendar-day other-month">25</div>
+            <div class="calendar-day other-month">26</div>
+            <div class="calendar-day other-month">27</div>
+            <div class="calendar-day other-month">28</div>
+            <div class="calendar-day other-month">29</div>
+            <div class="calendar-day other-month">30</div>
+            <div class="calendar-day">1</div>
+
+            <div class="calendar-day">2</div>
+            <div class="calendar-day">3</div>
+            <div class="calendar-day">4</div>
+            <div class="calendar-day">5</div>
+            <div class="calendar-day">6</div>
+            <div class="calendar-day">7</div>
+            <div class="calendar-day">8</div>
+
+            <div class="calendar-day">9</div>
+            <div class="calendar-day">10</div>
+            <div class="calendar-day">11</div>
+            <div class="calendar-day">12</div>
+            <div class="calendar-day">13</div>
+            <div class="calendar-day">14</div>
+            <div class="calendar-day">15</div>
+
+            <div class="calendar-day">16</div>
+            <div class="calendar-day">17</div>
+            <div class="calendar-day">18</div>
+            <div class="calendar-day">19</div>
+            <div class="calendar-day has-vacation">20<br/><span style="font-size: 10px;">Ana P.</span></div>
+            <div class="calendar-day has-vacation">21<br/><span style="font-size: 10px;">Ana P.</span></div>
+            <div class="calendar-day has-vacation">22<br/><span style="font-size: 10px;">Pedro M.</span></div>
+
+            <div class="calendar-day has-vacation">23</div>
+            <div class="calendar-day has-vacation">24</div>
+            <div class="calendar-day has-vacation">25</div>
+            <div class="calendar-day has-vacation">26</div>
+            <div class="calendar-day has-vacation">27<br/><span style="font-size: 10px;">Juan R.</span></div>
+            <div class="calendar-day has-vacation">28</div>
+            <div class="calendar-day has-vacation">29</div>
+
+            <div class="calendar-day has-vacation">30</div>
+            <div class="calendar-day has-vacation">31</div>
+            <div class="calendar-day other-month">1</div>
+            <div class="calendar-day other-month">2</div>
+            <div class="calendar-day other-month">3</div>
+            <div class="calendar-day other-month">4</div>
+            <div class="calendar-day other-month">5</div>
+          </div>
+
+          <div class="mt-4 text-xs text-gray-500 text-center">
+            <span class="inline-block w-3 h-3 bg-amber-200 border border-amber-500 rounded mr-1"></span>
+            = Vacaciones programadas
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <div class="h-16 lg:hidden"></div>
+</body>
+</html>

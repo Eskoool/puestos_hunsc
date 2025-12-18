@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Gestión de Puestos - Admin HUNSC</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "brand-primary": "#5A0E6E",
+            "brand-accent": "#AF9100",
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%); }
+    .card { background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    .draggable-item { cursor: move; transition: all 0.2s; }
+    .draggable-item:hover { transform: scale(1.02); }
+    .drop-zone { min-height: 120px; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 12px; }
+    .gradient-purple { background: linear-gradient(135deg, #5A0E6E 0%, #7B2D8E 100%); }
+    
+    /* Colores por área */
+    .area-unidosis { border-color: #8B5CF6; background: #F5F3FF; }
+    .area-farmacotecnia { border-color: #10B981; background: #ECFDF5; }
+    .area-nutricion { border-color: #F59E0B; background: #FFFBEB; }
+    .area-dispensacion { border-color: #3B82F6; background: #EFF6FF; }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-4">
+          <a href="admin-dashboard.html" class="material-symbols-outlined text-gray-600 hover:text-brand-primary">arrow_back</a>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900">Gestión de Puestos de Trabajo</h1>
+            <p class="text-sm text-gray-500">Asignar personal a puestos por área</p>
+          </div>
+        </div>
+        <button class="gradient-purple text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 flex items-center gap-2">
+          <span class="material-symbols-outlined">add</span>
+          Nueva Área/Puesto
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Leyenda de Colores -->
+    <div class="card p-6 mb-8">
+      <h3 class="font-bold text-gray-900 mb-4">Leyenda de Áreas</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded bg-purple-100 border-2 border-purple-500"></div>
+          <span class="text-sm font-medium">Unidosis</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded bg-green-100 border-2 border-green-500"></div>
+          <span class="text-sm font-medium">Farmacotecnia</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded bg-amber-100 border-2 border-amber-500"></div>
+          <span class="text-sm font-medium">Nutrición Parenteral</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded bg-blue-100 border-2 border-blue-500"></div>
+          <span class="text-sm font-medium">Dispensación</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout de Drag & Drop -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- IZQUIERDA: Personal Disponible -->
+      <div class="card p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Personal Disponible</h2>
+          <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">8 disponibles</span>
+        </div>
+
+        <div class="mb-4">
+          <input type="text" placeholder="Buscar personal..." class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"/>
+        </div>
+
+        <div class="space-y-3 max-h-[600px] overflow-y-auto">
+          <div class="draggable-item card p-4 flex items-center gap-4 cursor-move hover:shadow-lg">
+            <img class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKcxXJ0Vv5sAbJssDPgvEKn4I1b0IJ-Ip5OhDGYYw1pGuYwngNtRoWg-USkuAzwyAHqtdHv-5iTmXD_BZDIxZBvqDUNwSH72a7v0MJuKNlwnQ4J1HtQLEyrB5bzwYcnj2TuNYIAcaPMbRo6w8akD3h_TcKmxqUNwWcIEPNEOmC8DO8pNa1TlqmZhFN7AWUcChCvPw3mhBtQzgH0_fLK7N6Pp30rDCgkA1yeLLanDZgLRt4pVHquAeAmy8V-WxulVJnaJsqPEoxxeWx"/>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900">Ana Pérez García</h3>
+              <p class="text-sm text-gray-600">Farmacéutica Adjunta</p>
+            </div>
+            <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+          </div>
+
+          <div class="draggable-item card p-4 flex items-center gap-4 cursor-move hover:shadow-lg">
+            <img class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0Edi8pih2GyECwimRH89FeVlPa2hezMz99SmXdrE2bHNQ3Ae9FPhqqanglLZlLGoiDbaS5abHArR3waKfZ1ssKAAyGyTSnBpZqfGLNkq35R3Pca3-_xpYeM1kxYdVV8PCjZStANadEv2wX8vMGjYGNggzLrIw_swVeFqY6FmJ2lPwQuKp7zLt1UL1GfOlDp0CFUC-2iYCjaVak5e3KApBEnTC0k1S9sOnhuUPA_veQ_U8w28GGu7LEq-3O4ttnNTZtXraY1XFyE5"/>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900">Juan Rodríguez</h3>
+              <p class="text-sm text-gray-600">Técnico de Farmacia</p>
+            </div>
+            <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DERECHA: Puestos de Trabajo por Área -->
+      <div class="card p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">Puestos de Trabajo</h2>
+          <span class="px-3 py-1 bg-brand-primary text-white rounded-full text-sm font-semibold">4 áreas</span>
+        </div>
+
+        <div class="space-y-4 max-h-[600px] overflow-y-auto">
+          
+          <!-- ÁREA: Unidosis (Púrpura) -->
+          <div class="border-2 area-unidosis rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-full bg-purple-500"></div>
+                <h3 class="font-bold text-gray-900">Unidosis</h3>
+              </div>
+              <span class="text-xs font-semibold text-purple-700">2 puestos</span>
+            </div>
+            
+            <!-- Puesto 1 -->
+            <div class="mb-3">
+              <p class="text-sm font-semibold text-gray-700 mb-2">Turno Mañana (08:00-15:00)</p>
+              <div class="drop-zone bg-white">
+                <div class="card p-3 flex items-center gap-3 bg-purple-50">
+                  <img class="w-10 h-10 rounded-full" src="https://via.placeholder.com/40"/>
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-sm">Laura Gómez</h4>
+                    <p class="text-xs text-gray-600">Asignada</p>
+                  </div>
+                  <button class="text-red-500 hover:text-red-700">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Puesto 2 -->
+            <div>
+              <p class="text-sm font-semibold text-gray-700 mb-2">Turno Tarde (15:00-22:00)</p>
+              <div class="drop-zone bg-white">
+                <p class="text-center text-gray-400 text-sm py-4">Arrastra personal aquí</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ÁREA: Farmacotecnia (Verde) -->
+          <div class="border-2 area-farmacotecnia rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-full bg-green-500"></div>
+                <h3 class="font-bold text-gray-900">Farmacotecnia</h3>
+              </div>
+              <span class="text-xs font-semibold text-green-700">3 puestos</span>
+            </div>
+            
+            <div class="mb-3">
+              <p class="text-sm font-semibold text-gray-700 mb-2">Preparación Mezclas</p>
+              <div class="drop-zone bg-white">
+                <p class="text-center text-gray-400 text-sm py-4">Sin asignar</p>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <p class="text-sm font-semibold text-gray-700 mb-2">Control de Calidad</p>
+              <div class="drop-zone bg-white">
+                <div class="card p-3 flex items-center gap-3 bg-green-50">
+                  <img class="w-10 h-10 rounded-full" src="https://via.placeholder.com/40"/>
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-sm">Carlos Vega</h4>
+                    <p class="text-xs text-gray-600">Asignado</p>
+                  </div>
+                  <button class="text-red-500 hover:text-red-700">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-sm font-semibold text-gray-700 mb-2">Registro y Documentación</p>
+              <div class="drop-zone bg-white">
+                <p class="text-center text-gray-400 text-sm py-4">Sin asignar</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ÁREA: Nutrición Parenteral (Amarillo/Ámbar) -->
+          <div class="border-2 area-nutricion rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-full bg-amber-500"></div>
+                <h3 class="font-bold text-gray-900">Nutrición Parenteral</h3>
+              </div>
+              <span class="text-xs font-semibold text-amber-700">1 puesto</span>
+            </div>
+            
+            <div>
+              <p class="text-sm font-semibold text-gray-700 mb-2">Preparación NP</p>
+              <div class="drop-zone bg-white">
+                <p class="text-center text-gray-400 text-sm py-4">Sin asignar</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ÁREA: Dispensación (Azul) -->
+          <div class="border-2 area-dispensacion rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+                <h3 class="font-bold text-gray-900">Dispensación Ambulatoria</h3>
+              </div>
+              <span class="text-xs font-semibold text-blue-700">2 puestos</span>
+            </div>
+            
+            <div class="mb-3">
+              <p class="text-sm font-semibold text-gray-700 mb-2">Ventanilla 1</p>
+              <div class="drop-zone bg-white">
+                <div class="card p-3 flex items-center gap-3 bg-blue-50">
+                  <img class="w-10 h-10 rounded-full" src="https://via.placeholder.com/40"/>
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-sm">María Sanz</h4>
+                    <p class="text-xs text-gray-600">Asignada</p>
+                  </div>
+                  <button class="text-red-500 hover:text-red-700">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-sm font-semibold text-gray-700 mb-2">Ventanilla 2</p>
+              <div class="drop-zone bg-white">
+                <p class="text-center text-gray-400 text-sm py-4">Sin asignar</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="mt-8 flex justify-end gap-4">
+      <button class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button class="px-6 py-3 gradient-purple text-white rounded-xl font-semibold hover:opacity-90">
+        Guardar Asignaciones
+      </button>
+    </div>
+  </main>
+
+  <div class="h-16 lg:hidden"></div>
+</body>
+</html>

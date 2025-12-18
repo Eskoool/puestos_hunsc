@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Gestión de Guardias - Admin HUNSC</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "brand-primary": "#5A0E6E",
+            "brand-accent": "#AF9100",
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%); }
+    .card { background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+    .gradient-purple { background: linear-gradient(135deg, #5A0E6E 0%, #7B2D8E 100%); }
+
+    /* Calendar styles */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      background: #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .calendar-day {
+      background: white;
+      padding: 12px;
+      min-height: 100px;
+      font-size: 14px;
+      position: relative;
+    }
+    .calendar-day.other-month {
+      background: #f9fafb;
+      color: #9ca3af;
+    }
+    .calendar-day.today {
+      background: #EFF6FF;
+      border: 2px solid #3B82F6;
+    }
+    .calendar-header {
+      font-weight: 700;
+      text-align: center;
+      padding: 16px;
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    /* Guardias en calendario */
+    .guardia-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-top: 4px;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .guardia-mañana { background: #DBEAFE; color: #1E40AF; border: 1px solid #3B82F6; }
+    .guardia-tarde { background: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; }
+    .guardia-noche { background: #E9D5FF; color: #6B21A8; border: 1px solid #A855F7; }
+    .guardia-24h { background: #DCFCE7; color: #166534; border: 1px solid #10B981; }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-4">
+          <a href="admin-dashboard.html" class="material-symbols-outlined text-gray-600 hover:text-brand-primary">arrow_back</a>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900">Gestión de Guardias</h1>
+            <p class="text-sm text-gray-500">Calendario y reglas de asignación automática</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 flex items-center gap-2">
+            <span class="material-symbols-outlined">download</span>
+            Exportar
+          </button>
+          <button class="gradient-purple text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 flex items-center gap-2">
+            <span class="material-symbols-outlined">add</span>
+            Nueva Guardia
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Navegación de Meses -->
+    <div class="card p-4 mb-6">
+      <div class="flex items-center justify-between">
+        <button class="p-2 hover:bg-gray-100 rounded-lg">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <h2 class="text-2xl font-bold text-gray-900">Diciembre 2024</h2>
+        <button class="p-2 hover:bg-gray-100 rounded-lg">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Layout Principal -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+      <!-- IZQUIERDA: Calendario (3 columnas) -->
+      <div class="lg:col-span-3">
+        <div class="card p-6">
+
+          <!-- Leyenda de Tipos de Guardia -->
+          <div class="mb-6 flex flex-wrap gap-3 items-center">
+            <span class="text-sm font-semibold text-gray-700">Tipos de Guardia:</span>
+            <span class="guardia-mañana px-3 py-1 text-xs font-semibold">Mañana (08:00-15:00)</span>
+            <span class="guardia-tarde px-3 py-1 text-xs font-semibold">Tarde (15:00-22:00)</span>
+            <span class="guardia-noche px-3 py-1 text-xs font-semibold">Noche (22:00-08:00)</span>
+            <span class="guardia-24h px-3 py-1 text-xs font-semibold">24 Horas</span>
+          </div>
+
+          <!-- Calendario Completo -->
+          <div class="calendar-grid">
+            <div class="calendar-header">Lunes</div>
+            <div class="calendar-header">Martes</div>
+            <div class="calendar-header">Miércoles</div>
+            <div class="calendar-header">Jueves</div>
+            <div class="calendar-header">Viernes</div>
+            <div class="calendar-header">Sábado</div>
+            <div class="calendar-header">Domingo</div>
+
+            <!-- Semana 1 -->
+            <div class="calendar-day other-month">25<br/>Nov</div>
+            <div class="calendar-day other-month">26<br/>Nov</div>
+            <div class="calendar-day other-month">27<br/>Nov</div>
+            <div class="calendar-day other-month">28<br/>Nov</div>
+            <div class="calendar-day other-month">29<br/>Nov</div>
+            <div class="calendar-day other-month">30<br/>Nov</div>
+            <div class="calendar-day">
+              <div class="font-bold">1</div>
+              <span class="guardia-24h">María S.</span>
+            </div>
+
+            <!-- Semana 2 -->
+            <div class="calendar-day">
+              <div class="font-bold">2</div>
+              <span class="guardia-mañana">Ana P.</span>
+              <span class="guardia-tarde">Juan R.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">3</div>
+              <span class="guardia-noche">Pedro M.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">4</div>
+              <span class="guardia-mañana">Laura G.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">5</div>
+              <span class="guardia-tarde">Carlos V.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">6</div>
+              <span class="guardia-mañana">Elena R.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">7</div>
+              <span class="guardia-24h">Diego L.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">8</div>
+              <span class="guardia-24h">María S.</span>
+            </div>
+
+            <!-- Semana 3 -->
+            <div class="calendar-day">
+              <div class="font-bold">9</div>
+              <span class="guardia-mañana">Ana P.</span>
+              <span class="guardia-noche">Juan R.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">10</div>
+              <span class="guardia-tarde">Pedro M.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">11</div>
+              <span class="guardia-mañana">Laura G.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">12</div>
+              <span class="guardia-tarde">Carlos V.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">13</div>
+              <span class="guardia-noche">Elena R.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">14</div>
+              <span class="guardia-24h">Diego L.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">15</div>
+              <span class="guardia-24h">María S.</span>
+            </div>
+
+            <!-- Semana 4 -->
+            <div class="calendar-day">
+              <div class="font-bold">16</div>
+              <span class="guardia-mañana">Ana P.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">17</div>
+              <span class="guardia-tarde">Juan R.</span>
+            </div>
+            <div class="calendar-day today">
+              <div class="font-bold">18</div>
+              <span class="guardia-noche">Pedro M.</span>
+              <div class="absolute top-2 right-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">HOY</div>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">19</div>
+              <span class="guardia-mañana">Laura G.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">20</div>
+              <span class="text-xs text-gray-400">Sin asignar</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">21</div>
+              <span class="guardia-24h">Elena R.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">22</div>
+              <span class="guardia-24h">Diego L.</span>
+            </div>
+
+            <!-- Semana 5 -->
+            <div class="calendar-day">
+              <div class="font-bold">23</div>
+              <span class="guardia-mañana">María S.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">24</div>
+              <span class="guardia-tarde">Ana P.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">25</div>
+              <span class="guardia-noche">Juan R.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">26</div>
+              <span class="guardia-mañana">Pedro M.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">27</div>
+              <span class="text-xs text-gray-400">Sin asignar</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">28</div>
+              <span class="guardia-24h">Carlos V.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">29</div>
+              <span class="guardia-24h">Laura G.</span>
+            </div>
+
+            <!-- Semana 6 -->
+            <div class="calendar-day">
+              <div class="font-bold">30</div>
+              <span class="guardia-mañana">Elena R.</span>
+            </div>
+            <div class="calendar-day">
+              <div class="font-bold">31</div>
+              <span class="guardia-tarde">Diego L.</span>
+            </div>
+            <div class="calendar-day other-month">1<br/>Ene</div>
+            <div class="calendar-day other-month">2<br/>Ene</div>
+            <div class="calendar-day other-month">3<br/>Ene</div>
+            <div class="calendar-day other-month">4<br/>Ene</div>
+            <div class="calendar-day other-month">5<br/>Ene</div>
+          </div>
+
+        </div>
+
+        <!-- Configuración de Reglas Automáticas -->
+        <div class="card p-6 mt-6">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center">
+                <span class="material-symbols-outlined text-white">settings</span>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-gray-900">Reglas de Asignación Automática</h2>
+                <p class="text-sm text-gray-500">Configura la rueda de rotación de guardias</p>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" checked class="sr-only peer"/>
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary"></div>
+              <span class="ml-3 text-sm font-medium text-gray-700">Activada</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Configuración General -->
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-primary">tune</span>
+                Configuración General
+              </h3>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Frecuencia de Rotación</label>
+                  <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary">
+                    <option>Semanal</option>
+                    <option selected>Cada 2 semanas</option>
+                    <option>Mensual</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Días de descanso entre guardias</label>
+                  <input type="number" value="2" min="1" max="7" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"/>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Máximo de guardias/mes por persona</label>
+                  <input type="number" value="8" min="1" max="15" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"/>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+                  <input type="checkbox" checked class="w-5 h-5 text-brand-primary focus:ring-brand-primary rounded"/>
+                  <label class="text-sm font-medium text-gray-700">Evitar guardias en festivos</label>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+                  <input type="checkbox" checked class="w-5 h-5 text-brand-primary focus:ring-brand-primary rounded"/>
+                  <label class="text-sm font-medium text-gray-700">Respetar preferencias de horario</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Orden de Rotación -->
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-primary">sync</span>
+                Orden de Rotación (Arrastra para reordenar)
+              </h3>
+
+              <div class="space-y-2">
+                <div class="flex items-center gap-3 p-3 bg-white border-2 border-gray-200 rounded-xl hover:shadow-md cursor-move">
+                  <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+                  <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
+                  <div class="flex-1">
+                    <p class="font-semibold text-sm">María Sanz</p>
+                    <p class="text-xs text-gray-500">Última guardia: 15 Dic</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 bg-white border-2 border-gray-200 rounded-xl hover:shadow-md cursor-move">
+                  <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+                  <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
+                  <div class="flex-1">
+                    <p class="font-semibold text-sm">Ana Pérez</p>
+                    <p class="text-xs text-gray-500">Última guardia: 16 Dic</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 bg-white border-2 border-gray-200 rounded-xl hover:shadow-md cursor-move">
+                  <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+                  <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
+                  <div class="flex-1">
+                    <p class="font-semibold text-sm">Juan Rodríguez</p>
+                    <p class="text-xs text-gray-500">Última guardia: 17 Dic</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 bg-white border-2 border-gray-200 rounded-xl hover:shadow-md cursor-move">
+                  <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+                  <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm">4</div>
+                  <div class="flex-1">
+                    <p class="font-semibold text-sm">Pedro Martín</p>
+                    <p class="text-xs text-gray-500">Última guardia: 18 Dic</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 bg-white border-2 border-gray-200 rounded-xl hover:shadow-md cursor-move">
+                  <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+                  <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm">5</div>
+                  <div class="flex-1">
+                    <p class="font-semibold text-sm">Laura Gómez</p>
+                    <p class="text-xs text-gray-500">Última guardia: 19 Dic</p>
+                  </div>
+                </div>
+              </div>
+
+              <button class="w-full mt-4 px-4 py-2 border-2 border-dashed border-gray-300 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">add</span>
+                Agregar Personal a Rotación
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="mt-6 flex justify-end gap-4">
+            <button class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50">
+              Cancelar
+            </button>
+            <button class="px-6 py-3 gradient-purple text-white rounded-xl font-semibold hover:opacity-90">
+              Guardar Reglas
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DERECHA: Estadísticas y Próximas Guardias (1 columna) -->
+      <div class="lg:col-span-1 space-y-6">
+
+        <!-- Estadísticas del Mes -->
+        <div class="card p-6">
+          <h3 class="font-bold text-gray-900 mb-4 text-lg">Estadísticas Diciembre</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div>
+                <p class="text-sm font-medium text-gray-700">Total Guardias</p>
+                <p class="text-2xl font-bold text-blue-600">31</p>
+              </div>
+              <span class="material-symbols-outlined text-blue-500 text-3xl">event_available</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+              <div>
+                <p class="text-sm font-medium text-gray-700">Sin Asignar</p>
+                <p class="text-2xl font-bold text-amber-600">2</p>
+              </div>
+              <span class="material-symbols-outlined text-amber-500 text-3xl">event_busy</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              <div>
+                <p class="text-sm font-medium text-gray-700">Personal Activo</p>
+                <p class="text-2xl font-bold text-purple-600">8</p>
+              </div>
+              <span class="material-symbols-outlined text-purple-500 text-3xl">groups</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Próximas Guardias -->
+        <div class="card p-6">
+          <h3 class="font-bold text-gray-900 mb-4 text-lg">Próximas Guardias</h3>
+          <div class="space-y-3">
+            <div class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+              <div class="flex items-center justify-between mb-1">
+                <p class="font-semibold text-sm text-gray-900">Pedro Martín</p>
+                <span class="guardia-noche px-2 py-0.5">Noche</span>
+              </div>
+              <p class="text-xs text-gray-600">Hoy, 18 Dic • 22:00-08:00</p>
+            </div>
+
+            <div class="p-3 bg-amber-50 rounded-lg border-l-4 border-amber-500">
+              <div class="flex items-center justify-between mb-1">
+                <p class="font-semibold text-sm text-gray-900">Laura Gómez</p>
+                <span class="guardia-mañana px-2 py-0.5">Mañana</span>
+              </div>
+              <p class="text-xs text-gray-600">Mañana, 19 Dic • 08:00-15:00</p>
+            </div>
+
+            <div class="p-3 bg-gray-50 rounded-lg border-l-4 border-gray-400">
+              <div class="flex items-center justify-between mb-1">
+                <p class="font-semibold text-sm text-gray-900">Sin Asignar</p>
+                <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-semibold">Urgente</span>
+              </div>
+              <p class="text-xs text-gray-600">20 Dic • Todo el día</p>
+            </div>
+
+            <div class="p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
+              <div class="flex items-center justify-between mb-1">
+                <p class="font-semibold text-sm text-gray-900">Elena Ruiz</p>
+                <span class="guardia-24h px-2 py-0.5">24h</span>
+              </div>
+              <p class="text-xs text-gray-600">21 Dic • 00:00-23:59</p>
+            </div>
+
+            <div class="p-3 bg-green-50 rounded-lg border-l-4 border-green-500">
+              <div class="flex items-center justify-between mb-1">
+                <p class="font-semibold text-sm text-gray-900">Diego López</p>
+                <span class="guardia-24h px-2 py-0.5">24h</span>
+              </div>
+              <p class="text-xs text-gray-600">22 Dic • 00:00-23:59</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="card p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined text-amber-500">warning</span>
+            <h3 class="font-bold text-gray-900">Alertas</h3>
+          </div>
+          <div class="space-y-3">
+            <div class="p-3 bg-red-50 rounded-lg border border-red-200">
+              <p class="text-sm font-semibold text-red-900">2 guardias sin asignar</p>
+              <p class="text-xs text-red-700 mt-1">20 Dic y 27 Dic requieren asignación</p>
+            </div>
+            <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <p class="text-sm font-semibold text-amber-900">Vacaciones próximas</p>
+              <p class="text-xs text-amber-700 mt-1">3 personas de vacaciones 20-25 Dic</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <div class="h-16 lg:hidden"></div>
+</body>
+</html>
