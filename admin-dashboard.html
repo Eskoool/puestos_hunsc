@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Panel Administrador - Farmacia HUNSC Sur</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "brand-primary": "#5A0E6E",
+            "brand-secondary": "#7B2D8E",
+            "brand-accent": "#AF9100",
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%);
+      min-height: 100vh;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
+    }
+    .gradient-purple {
+      background: linear-gradient(135deg, #5A0E6E 0%, #7B2D8E 100%);
+    }
+    .gradient-gold {
+      background: linear-gradient(135deg, #AF9100 0%, #D4AF37 100%);
+    }
+    .badge-warning {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+    .badge-success {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+    .badge-danger {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Navbar Superior -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+          <img class="h-12 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzXkM_KUIOVVzeh5BDrH0HGTRPK27fkJTpzIqn5RXWhdp87qhApwz1viConktm7xbXWaCTWuXltnNbgZLiFHmYTE__WlVCOodGkOlNH_gYPo0mQlR9zgrkT44mOSvP8D379ZIbUEX6ipHWIEXB487rhFh9MgbLSRjPAc7KvD5bHD7wJtdlQDJRNDVF2Gho-R7rlEkhXjfFgeONiapM-AGKnFgo9HjNnFOfEnUyn0Emc0DLvBq-PvoFKj-zscz2MfUZle7t_5GYthAp" alt="Logo HUNSC"/>
+          <div class="hidden md:block">
+            <h1 class="text-xl font-bold text-gray-900">Panel Administrador</h1>
+            <p class="text-sm text-gray-500">Farmacia HUNSC Sur</p>
+          </div>
+        </div>
+
+        <!-- Navegación Desktop -->
+        <div class="hidden lg:flex items-center gap-6">
+          <a href="admin-dashboard.html" class="text-brand-primary font-semibold border-b-2 border-brand-primary pb-1">Dashboard</a>
+          <a href="admin-validaciones.html" class="text-gray-600 hover:text-brand-primary transition-colors">Validaciones</a>
+          <a href="admin-puestos.html" class="text-gray-600 hover:text-brand-primary transition-colors">Puestos</a>
+          <a href="admin-vacaciones.html" class="text-gray-600 hover:text-brand-primary transition-colors">Vacaciones</a>
+          <a href="admin-guardias.html" class="text-gray-600 hover:text-brand-primary transition-colors">Guardias</a>
+        </div>
+
+        <!-- User Menu -->
+        <div class="flex items-center gap-4">
+          <button class="p-2 hover:bg-gray-100 rounded-full transition-colors relative">
+            <span class="material-symbols-outlined text-gray-600">notifications</span>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+          <div class="w-10 h-10 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold">
+            A
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Panel de Control 📊</h1>
+      <p class="text-gray-600">Resumen de hoy - {Fecha Actual}</p>
+    </div>
+
+    <!-- Alertas Críticas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- Usuarios de Vacaciones Hoy -->
+      <div class="card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <span class="material-symbols-outlined text-blue-600">beach_access</span>
+            </div>
+            <h3 class="font-semibold text-gray-900">De Vacaciones Hoy</h3>
+          </div>
+          <span class="text-3xl font-bold text-blue-600">3</span>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="material-symbols-outlined text-sm">person</span>
+            <span>Ana Pérez García</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="material-symbols-outlined text-sm">person</span>
+            <span>Carlos Rodríguez</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="material-symbols-outlined text-sm">person</span>
+            <span>Laura Martínez</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Puestos Sin Asignar -->
+      <div class="card p-6 border-2 border-amber-200">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+              <span class="material-symbols-outlined text-amber-600">warning</span>
+            </div>
+            <h3 class="font-semibold text-gray-900">Puestos Sin Asignar</h3>
+          </div>
+          <span class="text-3xl font-bold text-amber-600">2</span>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-700">Unidosis - Turno Tarde</span>
+            <span class="badge-warning px-2 py-1 rounded-full text-xs font-semibold">Urgente</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-700">Farmacotecnia - Mañana</span>
+            <span class="badge-warning px-2 py-1 rounded-full text-xs font-semibold">Urgente</span>
+          </div>
+        </div>
+        <button class="mt-4 w-full bg-amber-600 text-white py-2 rounded-lg hover:bg-amber-700 transition-colors font-semibold">
+          Asignar Ahora
+        </button>
+      </div>
+
+      <!-- Validaciones Pendientes -->
+      <div class="card p-6 border-2 border-red-200">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+              <span class="material-symbols-outlined text-red-600">assignment_late</span>
+            </div>
+            <h3 class="font-semibold text-gray-900">Validaciones Pendientes</h3>
+          </div>
+          <span class="text-3xl font-bold text-red-600">5</span>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-700">Planta 3 - Cardiología</span>
+            <span class="badge-danger px-2 py-1 rounded-full text-xs font-semibold">Sin cubrir</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-700">Planta 5 - Oncología</span>
+            <span class="badge-danger px-2 py-1 rounded-full text-xs font-semibold">Sin cubrir</span>
+          </div>
+        </div>
+        <button class="mt-4 w-full gradient-purple text-white py-2 rounded-lg hover:opacity-90 transition-opacity font-semibold">
+          Gestionar Validaciones
+        </button>
+      </div>
+    </div>
+
+    <!-- Solicitudes Pendientes -->
+    <div class="card p-6 md:p-8 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Solicitudes Pendientes de Aprobación</h2>
+        <a href="admin-vacaciones.html" class="text-brand-primary font-semibold hover:underline">Ver todas</a>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Solicitud 1 -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-amber-50 rounded-xl gap-4">
+          <div class="flex items-center gap-4">
+            <img class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKcxXJ0Vv5sAbJssDPgvEKn4I1b0IJ-Ip5OhDGYYw1pGuYwngNtRoWg-USkuAzwyAHqtdHv-5iTmXD_BZDIxZBvqDUNwSH72a7v0MJuKNlwnQ4J1HtQLEyrB5bzwYcnj2TuNYIAcaPMbRo6w8akD3h_TcKmxqUNwWcIEPNEOmC8DO8pNa1TlqmZhFN7AWUcChCvPw3mhBtQzgH0_fLK7N6Pp30rDCgkA1yeLLanDZgLRt4pVHquAeAmy8V-WxulVJnaJsqPEoxxeWx"/>
+            <div>
+              <h3 class="font-semibold text-gray-900">María Fernández Sanz</h3>
+              <p class="text-sm text-gray-600">Vacaciones: 15-22 Enero 2025 (7 días)</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+              Aprobar
+            </button>
+            <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+              Rechazar
+            </button>
+          </div>
+        </div>
+
+        <!-- Solicitud 2 -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between p-4 bg-amber-50 rounded-xl gap-4">
+          <div class="flex items-center gap-4">
+            <img class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0Edi8pih2GyECwimRH89FeVlPa2hezMz99SmXdrE2bHNQ3Ae9FPhqqanglLZlLGoiDbaS5abHArR3waKfZ1ssKAAyGyTSnBpZqfGLNkq35R3Pca3-_xpYeM1kxYdVV8PCjZStANadEv2wX8vMGjYGNggzLrIw_swVeFqY6FmJ2lPwQuKp7zLt1UL1GfOlDp0CFUC-2iYCjaVak5e3KApBEnTC0k1S9sOnhuUPA_veQ_U8w28GGu7LEq-3O4ttnNTZtXraY1XFyE5"/>
+            <div>
+              <h3 class="font-semibold text-gray-900">Juan Rodríguez López</h3>
+              <p class="text-sm text-gray-600">Cambio Guardia: 25 Diciembre con Ana Pérez</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+              Aprobar
+            </button>
+            <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">
+              Rechazar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 gradient-purple rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-xl">group</span>
+          </div>
+          <h3 class="font-semibold text-gray-900">Personal Total</h3>
+        </div>
+        <p class="text-3xl font-bold text-brand-primary">32</p>
+        <p class="text-sm text-gray-600 mt-1">Activos hoy</p>
+      </div>
+
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-xl">check_circle</span>
+          </div>
+          <h3 class="font-semibold text-gray-900">Puestos Cubiertos</h3>
+        </div>
+        <p class="text-3xl font-bold text-green-600">28</p>
+        <p class="text-sm text-gray-600 mt-1">De 30 totales</p>
+      </div>
+
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 gradient-gold rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-xl">schedule</span>
+          </div>
+          <h3 class="font-semibold text-gray-900">Guardias Mes</h3>
+        </div>
+        <p class="text-3xl font-bold text-amber-600">45</p>
+        <p class="text-sm text-gray-600 mt-1">Diciembre 2024</p>
+      </div>
+
+      <div class="card p-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-xl">trending_up</span>
+          </div>
+          <h3 class="font-semibold text-gray-900">Asignaciones Hoy</h3>
+        </div>
+        <p class="text-3xl font-bold text-blue-600">15</p>
+        <p class="text-sm text-gray-600 mt-1">En curso</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Navegación Móvil (Solo visible en móvil) -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+    <div class="grid grid-cols-5 h-16">
+      <a href="admin-dashboard.html" class="flex flex-col items-center justify-center text-brand-primary">
+        <span class="material-symbols-outlined text-2xl">dashboard</span>
+        <span class="text-xs font-medium mt-1">Inicio</span>
+      </a>
+      <a href="admin-validaciones.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">verified</span>
+        <span class="text-xs mt-1">Validaciones</span>
+      </a>
+      <a href="admin-puestos.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">work</span>
+        <span class="text-xs mt-1">Puestos</span>
+      </a>
+      <a href="admin-vacaciones.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">event</span>
+        <span class="text-xs mt-1">Vacaciones</span>
+      </a>
+      <a href="admin-guardias.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">nights_stay</span>
+        <span class="text-xs mt-1">Guardias</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Espaciado para navegación móvil -->
+  <div class="h-16 lg:hidden"></div>
+</body>
+</html>
