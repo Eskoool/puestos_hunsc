@@ -66,10 +66,9 @@
         <!-- Navegación Desktop -->
         <div class="hidden lg:flex items-center gap-6">
           <a href="index.html" class="text-brand-primary font-semibold border-b-2 border-brand-primary pb-1">Dashboard</a>
-          <a href="pages/empleados.html" class="text-gray-600 hover:text-brand-primary transition-colors">Empleados</a>
           <a href="pages/vacaciones.html" class="text-gray-600 hover:text-brand-primary transition-colors">Vacaciones</a>
+          <a href="pages/guardias.html" class="text-gray-600 hover:text-brand-primary transition-colors">Guardias</a>
           <a href="pages/asignaciones.html" class="text-gray-600 hover:text-brand-primary transition-colors">Asignaciones</a>
-          <a href="pages/perfil.html" class="text-gray-600 hover:text-brand-primary transition-colors">Perfil</a>
         </div>
 
         <!-- User Menu -->
@@ -77,9 +76,9 @@
           <button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <span class="material-symbols-outlined text-gray-600">notifications</span>
           </button>
-          <div class="w-10 h-10 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold">
+          <a href="pages/perfil.html" class="w-10 h-10 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
             M
-          </div>
+          </a>
         </div>
       </div>
     </div>
@@ -225,20 +224,22 @@
         <span class="material-symbols-outlined text-2xl">dashboard</span>
         <span class="text-xs font-medium mt-1">Inicio</span>
       </a>
-      <a href="pages/empleados.html" class="flex flex-col items-center justify-center text-gray-600">
-        <span class="material-symbols-outlined text-2xl">group</span>
-        <span class="text-xs mt-1">Empleados</span>
-      </a>
       <a href="pages/vacaciones.html" class="flex flex-col items-center justify-center text-gray-600">
-        <span class="material-symbols-outlined text-2xl">calendar_month</span>
+        <span class="material-symbols-outlined text-2xl">event</span>
         <span class="text-xs mt-1">Vacaciones</span>
+      </a>
+      <a href="pages/guardias.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">calendar_month</span>
+        <span class="text-xs mt-1">Guardias</span>
       </a>
       <a href="pages/asignaciones.html" class="flex flex-col items-center justify-center text-gray-600">
         <span class="material-symbols-outlined text-2xl">assignment</span>
         <span class="text-xs mt-1">Áreas</span>
       </a>
       <a href="pages/perfil.html" class="flex flex-col items-center justify-center text-gray-600">
-        <span class="material-symbols-outlined text-2xl">person</span>
+        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary flex items-center justify-center text-white text-sm font-bold">
+          M
+        </div>
         <span class="text-xs mt-1">Perfil</span>
       </a>
     </div>
