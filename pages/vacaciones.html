@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Vacaciones y Guardias - Farmacia HUNSC Sur</title>
+  <title>Solicitar Vacaciones - Farmacia HUNSC Sur</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -73,11 +73,35 @@
     .vacaciones-border {
       --border-gradient: linear-gradient(135deg, rgba(90, 14, 110, 0.7), rgba(90, 14, 110, 0.2), rgba(255, 255, 255, 0.5));
     }
-    .guardia-border {
-      --border-gradient: linear-gradient(135deg, rgba(175, 145, 0, 0.7), rgba(175, 145, 0, 0.2), rgba(255, 255, 255, 0.5));
-    }
     body {
       min-height: max(884px, 100dvh);
+    }
+    .calendar-day {
+      transition: all 0.2s;
+    }
+    .calendar-day:hover {
+      transform: scale(1.05);
+    }
+    .calendar-day.selected {
+      background-color: rgba(90, 14, 110, 0.2);
+    }
+    .calendar-day.range-start {
+      background: #5A0E6E !important;
+      color: white !important;
+      border-radius: 9999px 0 0 9999px;
+    }
+    .calendar-day.range-end {
+      background: #5A0E6E !important;
+      color: white !important;
+      border-radius: 0 9999px 9999px 0;
+    }
+    .calendar-day.range-middle {
+      background-color: rgba(90, 14, 110, 0.2);
+    }
+    .calendar-day.single-selected {
+      background: #5A0E6E !important;
+      color: white !important;
+      border-radius: 9999px;
     }
   </style>
 </head>
@@ -94,9 +118,9 @@
               <img class="size-10 lg:size-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvoEjz6rh1XARmE4qjgceA2XWgy_RWK8_nh97Czbg0G7DC9C83nzysS97gxnqqWE_ohuCqXS3PldhdL4R4As76M-PpYqUbVUyuKOBl0ay2bYTuSE6Lhfhydaw-GGN9YlzhC3al8Qy2ElytjTUn9UZEmo8-ORpideCM0ZV_O3yt7ef-mQZwfgD3zSHBoQjlKX-5rMdz-DyBqMSMkjnwALg8IZNk_cagYXep17DylalRUs05vaD_c_tiFJ0mSs16oYyRqk75iXvxC5LJ"/>
             </a>
           </div>
-          <h1 class="text-slate-900 dark:text-white text-lg lg:text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Vacaciones y Guardias</h1>
+          <h1 class="text-slate-900 dark:text-white text-lg lg:text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Solicitar Vacaciones</h1>
           <div class="flex size-12 shrink-0 items-center justify-end">
-            <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">notifications</span>
+            <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">event</span>
           </div>
         </div>
       </div>
@@ -105,172 +129,375 @@
     <!-- Contenedor principal con max-width -->
     <div class="mx-auto w-full max-w-7xl flex-1 pb-20 lg:pb-8">
 
+    <!-- Cómputo de Días Disponibles -->
+    <div class="px-4 py-4">
+      <h2 class="text-slate-900 dark:text-white text-lg font-bold mb-3">Días Disponibles</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Vacaciones Anuales</p>
+              <p class="text-2xl font-bold text-primary">22 días</p>
+              <p class="text-xs text-slate-500 mt-1">de 30 totales</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-primary/30">beach_access</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Asuntos Propios</p>
+              <p class="text-2xl font-bold text-secondary">3 días</p>
+              <p class="text-xs text-slate-500 mt-1">de 5 totales</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-secondary/30">event_note</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Días Libres</p>
+              <p class="text-2xl font-bold text-green-600">2 días</p>
+              <p class="text-xs text-slate-500 mt-1">de 2 totales</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-green-600/30">free_cancellation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Toggle Principal -->
     <div class="flex px-4 py-3">
       <div class="flex h-12 flex-1 items-center justify-center rounded-full bg-slate-200 dark:bg-background-dark/80 p-1 shadow-inner">
         <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
           <span class="truncate">Solicitar</span>
-          <input checked class="invisible w-0" name="view-toggle" type="radio" value="Solicitar"/>
+          <input checked class="invisible w-0" name="view-toggle" type="radio" value="Solicitar" onchange="toggleView('solicitar')"/>
         </label>
         <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
           <span class="truncate">Mis Solicitudes</span>
-          <input class="invisible w-0" name="view-toggle" type="radio" value="Mis Solicitudes"/>
+          <input class="invisible w-0" name="view-toggle" type="radio" value="Mis Solicitudes" onchange="toggleView('historial')"/>
         </label>
       </div>
     </div>
 
-    <!-- Toggle de tipo de solicitud -->
-    <div class="px-4 py-2">
-      <div class="flex h-12 w-full items-center justify-center rounded-full bg-slate-200 dark:bg-background-dark/80 p-1 shadow-inner">
-        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
-          <span class="truncate">Vacaciones</span>
-          <input checked class="invisible w-0" name="request-type" type="radio" value="Vacaciones"/>
-        </label>
-        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-secondary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-secondary text-sm font-medium leading-normal transition-all duration-300">
-          <span class="truncate">Cambio de Guardia</span>
-          <input class="invisible w-0" name="request-type" type="radio" value="Cambio de Guardia"/>
-        </label>
+    <!-- Vista: Solicitar -->
+    <div id="view-solicitar">
+      <!-- Tipo de Vacaciones -->
+      <div class="px-4 py-2">
+        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Tipo de Solicitud</label>
+        <select id="vacation-type" class="form-select w-full rounded-full border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-primary">
+          <option value="anuales">Vacaciones Anuales (22 días disponibles)</option>
+          <option value="asuntos">Asuntos Propios (3 días disponibles)</option>
+          <option value="libres">Días Libres (2 días disponibles)</option>
+        </select>
       </div>
-    </div>
 
-    <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Nueva Solicitud de Vacaciones</h2>
+      <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Seleccionar Fechas</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400 px-4 pb-3">Haz clic en el primer día y luego en el último para seleccionar un rango. Haz clic de nuevo para deseleccionar.</p>
 
-    <!-- Calendario -->
-    <div class="flex flex-wrap items-center justify-center gap-6 px-4">
-      <div class="flex min-w-72 max-w-full flex-1 flex-col gap-0.5">
-        <div class="flex items-center p-1 justify-between">
-          <button class="flex size-10 items-center justify-center text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
-            <span class="material-symbols-outlined">chevron_left</span>
+      <!-- Calendario -->
+      <div class="flex flex-wrap items-center justify-center gap-6 px-4">
+        <div class="flex min-w-72 max-w-full flex-1 flex-col gap-0.5">
+          <div class="flex items-center p-1 justify-between">
+            <button onclick="changeMonth(-1)" class="flex size-10 items-center justify-center text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <p id="calendar-month" class="text-slate-900 dark:text-white text-base font-bold leading-tight flex-1 text-center">Diciembre 2024</p>
+            <button onclick="changeMonth(1)" class="flex size-10 items-center justify-center text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+          <div id="calendar" class="grid grid-cols-7 gap-y-1">
+            <!-- Calendar will be generated by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen de Selección -->
+      <div id="selection-summary" class="px-4 py-4 hidden">
+        <div class="glass-card rounded-lg p-4">
+          <h3 class="font-semibold text-slate-900 dark:text-white mb-2">Resumen de Selección</h3>
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Desde: <span id="start-date" class="font-semibold text-slate-900 dark:text-white"></span></p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">Hasta: <span id="end-date" class="font-semibold text-slate-900 dark:text-white"></span></p>
+            </div>
+            <div class="text-right">
+              <p class="text-3xl font-bold text-primary" id="total-days">0</p>
+              <p class="text-xs text-slate-500">días seleccionados</p>
+            </div>
+          </div>
+          <button onclick="clearSelection()" class="mt-3 w-full text-center text-sm text-red-600 hover:text-red-700 font-medium">
+            Limpiar selección
           </button>
-          <p class="text-slate-900 dark:text-white text-base font-bold leading-tight flex-1 text-center">Diciembre 2024</p>
-          <button class="flex size-10 items-center justify-center text-slate-800 dark:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
-            <span class="material-symbols-outlined">chevron_right</span>
-          </button>
         </div>
-        <div class="grid grid-cols-7 gap-y-1">
-          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">L</p>
-          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">M</p>
-          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">X</p>
-          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">J</p>
-          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">V</p>
-          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">S</p>
-          <p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">D</p>
+      </div>
 
-          <button class="h-12 w-full text-slate-400 dark:text-slate-600 col-start-7 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">1</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">2</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">3</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">4</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">5</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">6</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">7</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">8</div></button>
-          <button class="h-12 w-full text-white rounded-l-full bg-primary/20 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full bg-primary">9</div></button>
-          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">10</div></button>
-          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">11</div></button>
-          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">12</div></button>
-          <button class="h-12 w-full bg-primary/20 text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full">13</div></button>
-          <button class="h-12 w-full text-white rounded-r-full bg-primary/20 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full bg-primary">14</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">15</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">16</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">17</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">18</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">19</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">20</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">21</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">22</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">23</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">24</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">25</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">26</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">27</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">28</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">29</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">30</div></button>
-          <button class="h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal"><div class="flex size-full items-center justify-center rounded-full hover:bg-primary/20">31</div></button>
+      <!-- Comentarios -->
+      <div class="px-4 py-2">
+        <label class="flex flex-col w-full relative">
+          <span class="text-xs font-medium text-primary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Motivo / Comentarios</span>
+          <textarea id="comments" class="form-textarea w-full resize-none rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-slate-300 dark:border-slate-600 bg-transparent p-4 placeholder:text-slate-400" placeholder="Describe el motivo de tu solicitud..." rows="3"></textarea>
+        </label>
+      </div>
+
+      <!-- Botón de envío -->
+      <div class="px-4 py-4">
+        <button onclick="submitRequest()" class="flex w-full items-center justify-center rounded-full bg-primary h-14 text-white text-base font-bold leading-normal shadow-lg shadow-primary/30 hover:bg-primary/90">
+          Enviar Solicitud
+        </button>
+      </div>
+    </div>
+
+    <!-- Vista: Historial -->
+    <div id="view-historial" class="hidden">
+      <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Historial de Solicitudes</h2>
+
+      <div class="flex flex-col gap-4 px-4 pb-8">
+        <!-- Solicitud Aprobada -->
+        <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium text-primary">Vacaciones Anuales</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">12/11/2024 - 18/11/2024</p>
+              <p class="text-lg font-bold text-slate-800 dark:text-slate-100">7 días</p>
+            </div>
+            <div class="flex items-center gap-2 rounded-full bg-status-approved/10 px-3 py-1 text-sm font-medium text-status-approved dark:text-primary">
+              <span class="material-symbols-outlined text-base">check_circle</span>
+              <span>Aprobado</span>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> Viaje familiar programado.</p>
+        </div>
+
+        <!-- Solicitud Pendiente -->
+        <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium text-secondary">Asuntos Propios</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">20/12/2024 - 21/12/2024</p>
+              <p class="text-lg font-bold text-slate-800 dark:text-slate-100">2 días</p>
+            </div>
+            <div class="flex items-center gap-2 rounded-full bg-status-pending/10 px-3 py-1 text-sm font-medium text-status-pending dark:text-secondary">
+              <span class="material-symbols-outlined text-base">hourglass_top</span>
+              <span>Pendiente</span>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> Asunto personal urgente.</p>
+          <div class="flex gap-3 pt-2">
+            <button class="flex-1 rounded-full h-10 bg-red-500 text-white font-semibold text-sm hover:bg-red-600">Cancelar Solicitud</button>
+          </div>
+        </div>
+
+        <!-- Solicitud Rechazada -->
+        <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm font-medium text-primary">Vacaciones Anuales</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">01/10/2024 - 03/10/2024</p>
+              <p class="text-lg font-bold text-slate-800 dark:text-slate-100">3 días</p>
+            </div>
+            <div class="flex items-center gap-2 rounded-full bg-status-rejected/10 px-3 py-1 text-sm font-medium text-status-rejected dark:text-status-rejected/80">
+              <span class="material-symbols-outlined text-base">cancel</span>
+              <span>Rechazado</span>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo denegación:</strong> Falta de cobertura en esas fechas.</p>
         </div>
       </div>
     </div>
 
-    <!-- Formulario de fechas -->
-    <div class="flex w-full flex-wrap items-end gap-4 px-4 py-3">
-      <label class="flex flex-col min-w-40 flex-1 relative">
-        <span class="text-xs font-medium text-primary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Fecha de Inicio</span>
-        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-slate-300 dark:border-slate-600 bg-transparent h-14 placeholder:text-slate-400 p-4 text-base font-normal leading-normal" value="09/12/2024"/>
-      </label>
-      <label class="flex flex-col min-w-40 flex-1 relative">
-        <span class="text-xs font-medium text-primary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Fecha de Fin</span>
-        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-slate-300 dark:border-slate-600 bg-transparent h-14 placeholder:text-slate-400 p-4 text-base font-normal leading-normal" value="14/12/2024"/>
-      </label>
-    </div>
-
-    <!-- Comentarios -->
-    <div class="px-4 py-2">
-      <label class="flex flex-col w-full relative">
-        <span class="text-xs font-medium text-primary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Comentarios (opcional)</span>
-        <textarea class="form-textarea w-full resize-none rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-slate-300 dark:border-slate-600 bg-transparent p-4 placeholder:text-slate-400" placeholder="Añadir un comentario..." rows="3"></textarea>
-      </label>
-    </div>
-
-    <!-- Botón de envío -->
-    <div class="px-4 py-4">
-      <button class="flex w-full items-center justify-center rounded-full bg-primary h-14 text-white text-base font-bold leading-normal shadow-lg shadow-primary/30">Enviar Solicitud</button>
-    </div>
-
-    <!-- Historial de solicitudes -->
-    <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Historial de Solicitudes</h2>
-
-    <div class="flex flex-col gap-4 px-4 pb-8">
-      <!-- Solicitud Aprobada -->
-      <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-sm font-medium text-primary">Vacaciones</p>
-            <p class="text-sm text-slate-600 dark:text-slate-400">12/11/2024 - 18/11/2024</p>
-            <p class="text-lg font-bold text-slate-800 dark:text-slate-100">7 días</p>
-          </div>
-          <div class="flex items-center gap-2 rounded-full bg-status-approved/10 px-3 py-1 text-sm font-medium text-status-approved dark:text-primary">
-            <span class="material-symbols-outlined text-base">check_circle</span>
-            <span>Aprobado</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Solicitud Pendiente -->
-      <div class="glass-card iridescent-border guardia-border rounded-lg p-4 flex flex-col gap-3">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-sm font-medium text-secondary">Cambio de Guardia</p>
-            <p class="text-sm text-slate-600 dark:text-slate-400">Con Ana Pérez, 25/12/2024</p>
-            <p class="text-lg font-bold text-slate-800 dark:text-slate-100">Guardia de Noche</p>
-          </div>
-          <div class="flex items-center gap-2 rounded-full bg-status-pending/10 px-3 py-1 text-sm font-medium text-status-pending dark:text-secondary">
-            <span class="material-symbols-outlined text-base">hourglass_top</span>
-            <span>Pendiente</span>
-          </div>
-        </div>
-        <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> Asunto familiar importante.</p>
-        <div class="flex gap-3 pt-2">
-          <button class="flex-1 rounded-full h-10 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-sm">Cancelar</button>
-          <button class="flex-1 rounded-full h-10 bg-secondary/20 text-secondary font-semibold text-sm">Editar</button>
-        </div>
-      </div>
-
-      <!-- Solicitud Rechazada -->
-      <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-sm font-medium text-primary">Vacaciones</p>
-            <p class="text-sm text-slate-600 dark:text-slate-400">01/10/2024 - 03/10/2024</p>
-            <p class="text-lg font-bold text-slate-800 dark:text-slate-100">3 días</p>
-          </div>
-          <div class="flex items-center gap-2 rounded-full bg-status-rejected/10 px-3 py-1 text-sm font-medium text-status-rejected dark:text-status-rejected/80">
-            <span class="material-symbols-outlined text-base">cancel</span>
-            <span>Rechazado</span>
-          </div>
-        </div>
-      </div>
-    </div>
     </div><!-- Cierre contenedor max-w-7xl -->
+
+    <!-- Navegación inferior (solo móvil) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 z-20 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700">
+      <div class="mx-auto flex h-20 max-w-md items-center justify-around px-4">
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="../index.html">
+          <span class="material-symbols-outlined">home</span>
+          <span class="text-xs font-medium">Inicio</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-primary dark:text-primary" href="vacaciones.html">
+          <span class="material-symbols-outlined">event</span>
+          <span class="text-xs font-bold">Vacaciones</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="guardias.html">
+          <span class="material-symbols-outlined">swap_horiz</span>
+          <span class="text-xs font-medium">Guardias</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="asignaciones.html">
+          <span class="material-symbols-outlined">assignment_ind</span>
+          <span class="text-xs font-medium">Asignación</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="perfil.html">
+          <span class="material-symbols-outlined">person</span>
+          <span class="text-xs font-medium">Perfil</span>
+        </a>
+      </div>
+    </nav>
   </div>
+
+  <script>
+    let currentMonth = 11; // Diciembre (0-indexed)
+    let currentYear = 2024;
+    let selectedDays = [];
+    let selectionStart = null;
+
+    function toggleView(view) {
+      if (view === 'solicitar') {
+        document.getElementById('view-solicitar').classList.remove('hidden');
+        document.getElementById('view-historial').classList.add('hidden');
+      } else {
+        document.getElementById('view-solicitar').classList.add('hidden');
+        document.getElementById('view-historial').classList.remove('hidden');
+      }
+    }
+
+    function renderCalendar() {
+      const calendar = document.getElementById('calendar');
+      const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+      document.getElementById('calendar-month').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1; // Adjust for Monday start
+
+      let html = '';
+
+      // Headers
+      const dayHeaders = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+      dayHeaders.forEach(day => {
+        html += `<p class="text-slate-500 dark:text-slate-400 text-xs font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">${day}</p>`;
+      });
+
+      // Empty cells before first day
+      for (let i = 0; i < adjustedFirstDay; i++) {
+        html += '<div class="h-12 w-full"></div>';
+      }
+
+      // Days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const isSelected = selectedDays.includes(dateStr);
+        const isStart = dateStr === selectionStart;
+        const isEnd = selectedDays.length > 1 && dateStr === selectedDays[selectedDays.length - 1] && dateStr !== selectionStart;
+        const isMiddle = selectedDays.includes(dateStr) && !isStart && !isEnd;
+
+        let className = 'calendar-day h-12 w-full text-slate-800 dark:text-slate-200 text-sm font-medium leading-normal cursor-pointer';
+        let innerClass = 'flex size-full items-center justify-center rounded-full';
+
+        if (isStart && isEnd) {
+          className += ' single-selected';
+        } else if (isStart) {
+          className += ' range-start';
+        } else if (isEnd) {
+          className += ' range-end';
+        } else if (isMiddle) {
+          className += ' range-middle';
+        } else {
+          innerClass += ' hover:bg-primary/20';
+        }
+
+        html += `<button class="${className}" onclick="selectDay('${dateStr}')"><div class="${innerClass}">${day}</div></button>`;
+      }
+
+      calendar.innerHTML = html;
+    }
+
+    function selectDay(dateStr) {
+      if (selectionStart === null) {
+        // Start new selection
+        selectionStart = dateStr;
+        selectedDays = [dateStr];
+      } else {
+        // Complete range or deselect
+        if (selectedDays.includes(dateStr)) {
+          // Deselect - clear everything
+          clearSelection();
+          return;
+        }
+
+        const start = new Date(selectionStart);
+        const end = new Date(dateStr);
+
+        if (end < start) {
+          // Swap if end is before start
+          selectionStart = dateStr;
+          selectedDays = [dateStr];
+        } else {
+          // Fill range
+          selectedDays = [];
+          const current = new Date(start);
+          while (current <= end) {
+            const str = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
+            selectedDays.push(str);
+            current.setDate(current.getDate() + 1);
+          }
+        }
+      }
+
+      updateSummary();
+      renderCalendar();
+    }
+
+    function updateSummary() {
+      if (selectedDays.length > 0) {
+        document.getElementById('selection-summary').classList.remove('hidden');
+        document.getElementById('start-date').textContent = formatDate(selectedDays[0]);
+        document.getElementById('end-date').textContent = formatDate(selectedDays[selectedDays.length - 1]);
+        document.getElementById('total-days').textContent = selectedDays.length;
+      } else {
+        document.getElementById('selection-summary').classList.add('hidden');
+      }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    function clearSelection() {
+      selectedDays = [];
+      selectionStart = null;
+      updateSummary();
+      renderCalendar();
+    }
+
+    function changeMonth(delta) {
+      currentMonth += delta;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      renderCalendar();
+    }
+
+    function submitRequest() {
+      if (selectedDays.length === 0) {
+        alert('Por favor selecciona al menos un día');
+        return;
+      }
+
+      const type = document.getElementById('vacation-type').options[document.getElementById('vacation-type').selectedIndex].text;
+      const comments = document.getElementById('comments').value;
+
+      alert(`Solicitud enviada:\n\nTipo: ${type}\nDías: ${selectedDays.length}\nDesde: ${formatDate(selectedDays[0])}\nHasta: ${formatDate(selectedDays[selectedDays.length - 1])}\nMotivo: ${comments || 'Sin comentarios'}`);
+
+      // Reset
+      clearSelection();
+      document.getElementById('comments').value = '';
+    }
+
+    // Initialize calendar
+    renderCalendar();
+  </script>
 </body>
 </html>

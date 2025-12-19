@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Cambio de Guardias - Farmacia HUNSC Sur</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/styles.css"/>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5A0E6E",
+            "secondary": "#AF9100",
+            "tertiary": "#D4AF37",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101c22",
+            "status-approved": "#5A0E6E",
+            "status-pending": "#AF9100",
+            "status-rejected": "#993333"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "1.5rem",
+            "xl": "2rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    .glass-card {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glass-card {
+      background-color: rgba(26, 38, 47, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .iridescent-border {
+      position: relative;
+      z-index: 1;
+    }
+    .iridescent-border::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 1.5rem;
+      padding: 1px;
+      background: var(--border-gradient);
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: -1;
+    }
+    .guardia-border {
+      --border-gradient: linear-gradient(135deg, rgba(175, 145, 0, 0.7), rgba(175, 145, 0, 0.2), rgba(255, 255, 255, 0.5));
+    }
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
+  <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+
+    <!-- Header con max-width responsive -->
+    <div class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+      <div class="mx-auto max-w-7xl">
+        <div class="flex items-center p-4 lg:p-6 pb-2 justify-between">
+          <div class="flex size-12 shrink-0 items-center justify-start">
+            <a href="../index.html">
+              <img class="size-10 lg:size-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvoEjz6rh1XARmE4qjgceA2XWgy_RWK8_nh97Czbg0G7DC9C83nzysS97gxnqqWE_ohuCqXS3PldhdL4R4As76M-PpYqUbVUyuKOBl0ay2bYTuSE6Lhfhydaw-GGN9YlzhC3al8Qy2ElytjTUn9UZEmo8-ORpideCM0ZV_O3yt7ef-mQZwfgD3zSHBoQjlKX-5rMdz-DyBqMSMkjnwALg8IZNk_cagYXep17DylalRUs05vaD_c_tiFJ0mSs16oYyRqk75iXvxC5LJ"/>
+            </a>
+          </div>
+          <h1 class="text-slate-900 dark:text-white text-lg lg:text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Cambio de Guardias</h1>
+          <div class="flex size-12 shrink-0 items-center justify-end">
+            <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">swap_horiz</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor principal con max-width -->
+    <div class="mx-auto w-full max-w-7xl flex-1 pb-20 lg:pb-8">
+
+    <!-- Mis Próximas Guardias -->
+    <div class="px-4 py-4">
+      <h2 class="text-slate-900 dark:text-white text-lg font-bold mb-3">Mis Próximas Guardias</h2>
+      <div class="flex flex-col gap-3">
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-xs text-slate-600 dark:text-slate-400">Jueves, 19 Diciembre 2024</p>
+              <p class="text-lg font-bold text-slate-900 dark:text-white">Guardia de Mañana</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">08:00 - 15:00</p>
+            </div>
+            <button onclick="initSwap('2024-12-19', 'Mañana')" class="px-4 py-2 bg-secondary/20 text-secondary rounded-full font-semibold text-sm hover:bg-secondary/30">
+              Solicitar Cambio
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-xs text-slate-600 dark:text-slate-400">Sábado, 21 Diciembre 2024</p>
+              <p class="text-lg font-bold text-slate-900 dark:text-white">Guardia de 24 horas</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">00:00 - 23:59</p>
+            </div>
+            <button onclick="initSwap('2024-12-21', '24h')" class="px-4 py-2 bg-secondary/20 text-secondary rounded-full font-semibold text-sm hover:bg-secondary/30">
+              Solicitar Cambio
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-xs text-slate-600 dark:text-slate-400">Miércoles, 25 Diciembre 2024</p>
+              <p class="text-lg font-bold text-slate-900 dark:text-white">Guardia de Noche</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400">22:00 - 08:00</p>
+            </div>
+            <button onclick="initSwap('2024-12-25', 'Noche')" class="px-4 py-2 bg-secondary/20 text-secondary rounded-full font-semibold text-sm hover:bg-secondary/30">
+              Solicitar Cambio
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle Principal -->
+    <div class="flex px-4 py-3">
+      <div class="flex h-12 flex-1 items-center justify-center rounded-full bg-slate-200 dark:bg-background-dark/80 p-1 shadow-inner">
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-secondary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-secondary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Solicitar Cambio</span>
+          <input checked class="invisible w-0" name="view-toggle" type="radio" value="Solicitar" onchange="toggleView('solicitar')"/>
+        </label>
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-secondary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-secondary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Mis Solicitudes</span>
+          <input class="invisible w-0" name="view-toggle" type="radio" value="Historial" onchange="toggleView('historial')"/>
+        </label>
+      </div>
+    </div>
+
+    <!-- Vista: Solicitar Cambio -->
+    <div id="view-solicitar">
+      <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Nueva Solicitud de Cambio</h2>
+
+      <!-- Formulario -->
+      <div class="px-4 space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Mi Guardia a Intercambiar</label>
+          <select id="my-shift" class="form-select w-full rounded-full border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-secondary">
+            <option value="">Selecciona tu guardia...</option>
+            <option value="2024-12-19-manana">19 Dic - Guardia Mañana (08:00-15:00)</option>
+            <option value="2024-12-21-24h">21 Dic - Guardia 24h (00:00-23:59)</option>
+            <option value="2024-12-25-noche">25 Dic - Guardia Noche (22:00-08:00)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Compañero con quien Intercambiar</label>
+          <select id="colleague" class="form-select w-full rounded-full border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-secondary">
+            <option value="">Selecciona un compañero...</option>
+            <option value="ana">Ana Pérez García</option>
+            <option value="juan">Juan Rodríguez</option>
+            <option value="pedro">Pedro Martín</option>
+            <option value="laura">Laura Gómez</option>
+            <option value="carlos">Carlos Vega</option>
+          </select>
+        </div>
+
+        <div id="colleague-shifts" class="hidden">
+          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Guardia del Compañero a Recibir</label>
+          <select id="their-shift" class="form-select w-full rounded-full border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-secondary">
+            <option value="">Cargando guardias del compañero...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="flex flex-col w-full relative">
+            <span class="text-xs font-medium text-secondary absolute -top-2 left-4 bg-background-light dark:bg-background-dark px-1">Motivo del Cambio</span>
+            <textarea id="swap-reason" class="form-textarea w-full resize-none rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-secondary border border-slate-300 dark:border-slate-600 bg-transparent p-4 placeholder:text-slate-400" placeholder="Explica por qué necesitas hacer este cambio..." rows="3"></textarea>
+          </label>
+        </div>
+
+        <!-- Resumen del Cambio -->
+        <div id="swap-summary" class="glass-card rounded-lg p-4 hidden">
+          <h3 class="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary">swap_horiz</span>
+            Resumen del Intercambio
+          </h3>
+          <div class="space-y-2">
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full bg-red-500"></div>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">Entregas:</p>
+                <p id="summary-give" class="text-xs text-slate-600 dark:text-slate-400">-</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-2 h-2 rounded-full bg-green-500"></div>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">Recibes:</p>
+                <p id="summary-receive" class="text-xs text-slate-600 dark:text-slate-400">-</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón de envío -->
+        <button onclick="submitSwap()" class="flex w-full items-center justify-center rounded-full bg-secondary h-14 text-white text-base font-bold leading-normal shadow-lg shadow-secondary/30 hover:bg-secondary/90">
+          Enviar Solicitud de Cambio
+        </button>
+      </div>
+    </div>
+
+    <!-- Vista: Historial -->
+    <div id="view-historial" class="hidden">
+      <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Mis Solicitudes de Cambio</h2>
+
+      <div class="flex flex-col gap-4 px-4 pb-8">
+        <!-- Solicitud Pendiente -->
+        <div class="glass-card iridescent-border guardia-border rounded-lg p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-secondary">Cambio de Guardia</p>
+              <div class="mt-2 space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-red-500 text-sm">arrow_forward</span>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">Entregas: 25 Dic - Guardia Noche</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-green-500 text-sm">arrow_back</span>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">Recibes: 28 Dic - Guardia Mañana</p>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">Con: Ana Pérez García</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 rounded-full bg-status-pending/10 px-3 py-1 text-sm font-medium text-status-pending dark:text-secondary">
+              <span class="material-symbols-outlined text-base">hourglass_top</span>
+              <span>Pendiente</span>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> Asunto familiar importante en Navidad.</p>
+          <div class="flex gap-3 pt-2">
+            <button class="flex-1 rounded-full h-10 bg-red-500 text-white font-semibold text-sm hover:bg-red-600">Cancelar Solicitud</button>
+          </div>
+        </div>
+
+        <!-- Solicitud Aprobada -->
+        <div class="glass-card iridescent-border guardia-border rounded-lg p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-secondary">Cambio de Guardia</p>
+              <div class="mt-2 space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-red-500 text-sm">arrow_forward</span>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">Entregaste: 15 Dic - Guardia Tarde</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-green-500 text-sm">arrow_back</span>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">Recibiste: 18 Dic - Guardia Mañana</p>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">Con: Juan Rodríguez</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 rounded-full bg-status-approved/10 px-3 py-1 text-sm font-medium text-status-approved dark:text-primary">
+              <span class="material-symbols-outlined text-base">check_circle</span>
+              <span>Aprobado</span>
+            </div>
+          </div>
+          <p class="text-sm text-green-600 dark:text-green-400"><strong>Aprobado por:</strong> Administración (hace 2 días)</p>
+        </div>
+
+        <!-- Solicitud Rechazada -->
+        <div class="glass-card iridescent-border guardia-border rounded-lg p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-secondary">Cambio de Guardia</p>
+              <div class="mt-2 space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-red-500 text-sm">arrow_forward</span>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">Querías entregar: 10 Dic - Guardia 24h</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-green-500 text-sm">arrow_back</span>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">Querías recibir: 12 Dic - Guardia Mañana</p>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">Con: Pedro Martín</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 rounded-full bg-status-rejected/10 px-3 py-1 text-sm font-medium text-status-rejected dark:text-status-rejected/80">
+              <span class="material-symbols-outlined text-base">cancel</span>
+              <span>Rechazado</span>
+            </div>
+          </div>
+          <p class="text-sm text-red-600 dark:text-red-400"><strong>Motivo denegación:</strong> El compañero no aceptó el cambio.</p>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- Cierre contenedor max-w-7xl -->
+
+    <!-- Navegación inferior (solo móvil) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 z-20 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700">
+      <div class="mx-auto flex h-20 max-w-md items-center justify-around px-4">
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="../index.html">
+          <span class="material-symbols-outlined">home</span>
+          <span class="text-xs font-medium">Inicio</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="vacaciones.html">
+          <span class="material-symbols-outlined">event</span>
+          <span class="text-xs font-medium">Vacaciones</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-secondary dark:text-secondary" href="guardias.html">
+          <span class="material-symbols-outlined">swap_horiz</span>
+          <span class="text-xs font-bold">Guardias</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="asignaciones.html">
+          <span class="material-symbols-outlined">assignment_ind</span>
+          <span class="text-xs font-medium">Asignación</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="perfil.html">
+          <span class="material-symbols-outlined">person</span>
+          <span class="text-xs font-medium">Perfil</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    function toggleView(view) {
+      if (view === 'solicitar') {
+        document.getElementById('view-solicitar').classList.remove('hidden');
+        document.getElementById('view-historial').classList.add('hidden');
+      } else {
+        document.getElementById('view-solicitar').classList.add('hidden');
+        document.getElementById('view-historial').classList.remove('hidden');
+      }
+    }
+
+    function initSwap(date, type) {
+      toggleView('solicitar');
+      const select = document.getElementById('my-shift');
+      const mapping = {
+        '2024-12-19': '2024-12-19-manana',
+        '2024-12-21': '2024-12-21-24h',
+        '2024-12-25': '2024-12-25-noche'
+      };
+      select.value = mapping[date] || '';
+      updateSummary();
+    }
+
+    // Listen for colleague selection
+    document.addEventListener('DOMContentLoaded', function() {
+      const colleagueSelect = document.getElementById('colleague');
+      const colleagueShiftsDiv = document.getElementById('colleague-shifts');
+      const theirShiftSelect = document.getElementById('their-shift');
+
+      colleagueSelect.addEventListener('change', function() {
+        if (this.value) {
+          colleagueShiftsDiv.classList.remove('hidden');
+          // Simular carga de guardias del compañero
+          const shifts = {
+            'ana': [
+              { value: '2024-12-20-tarde', label: '20 Dic - Guardia Tarde (15:00-22:00)' },
+              { value: '2024-12-28-manana', label: '28 Dic - Guardia Mañana (08:00-15:00)' }
+            ],
+            'juan': [
+              { value: '2024-12-22-noche', label: '22 Dic - Guardia Noche (22:00-08:00)' },
+              { value: '2024-12-27-24h', label: '27 Dic - Guardia 24h (00:00-23:59)' }
+            ],
+            'pedro': [
+              { value: '2024-12-23-manana', label: '23 Dic - Guardia Mañana (08:00-15:00)' }
+            ],
+            'laura': [
+              { value: '2024-12-24-tarde', label: '24 Dic - Guardia Tarde (15:00-22:00)' },
+              { value: '2024-12-26-noche', label: '26 Dic - Guardia Noche (22:00-08:00)' }
+            ],
+            'carlos': [
+              { value: '2024-12-29-24h', label: '29 Dic - Guardia 24h (00:00-23:59)' }
+            ]
+          };
+
+          theirShiftSelect.innerHTML = '<option value="">Selecciona la guardia...</option>';
+          (shifts[this.value] || []).forEach(shift => {
+            const option = document.createElement('option');
+            option.value = shift.value;
+            option.textContent = shift.label;
+            theirShiftSelect.appendChild(option);
+          });
+        } else {
+          colleagueShiftsDiv.classList.add('hidden');
+        }
+        updateSummary();
+      });
+
+      document.getElementById('my-shift').addEventListener('change', updateSummary);
+      theirShiftSelect.addEventListener('change', updateSummary);
+    });
+
+    function updateSummary() {
+      const myShift = document.getElementById('my-shift');
+      const theirShift = document.getElementById('their-shift');
+      const summaryDiv = document.getElementById('swap-summary');
+      const summaryGive = document.getElementById('summary-give');
+      const summaryReceive = document.getElementById('summary-receive');
+
+      if (myShift.value && theirShift.value) {
+        summaryDiv.classList.remove('hidden');
+        summaryGive.textContent = myShift.options[myShift.selectedIndex].text;
+        summaryReceive.textContent = theirShift.options[theirShift.selectedIndex].text;
+      } else {
+        summaryDiv.classList.add('hidden');
+      }
+    }
+
+    function submitSwap() {
+      const myShift = document.getElementById('my-shift');
+      const colleague = document.getElementById('colleague');
+      const theirShift = document.getElementById('their-shift');
+      const reason = document.getElementById('swap-reason');
+
+      if (!myShift.value || !colleague.value || !theirShift.value || !reason.value.trim()) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
+
+      alert(`Solicitud de cambio enviada:\n\nEntregas: ${myShift.options[myShift.selectedIndex].text}\nRecibes: ${theirShift.options[theirShift.selectedIndex].text}\nCon: ${colleague.options[colleague.selectedIndex].text}\nMotivo: ${reason.value}`);
+
+      // Reset form
+      myShift.value = '';
+      colleague.value = '';
+      theirShift.value = '';
+      reason.value = '';
+      document.getElementById('colleague-shifts').classList.add('hidden');
+      updateSummary();
+    }
+  </script>
+</body>
+</html>
