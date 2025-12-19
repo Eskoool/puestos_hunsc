@@ -113,15 +113,14 @@
     <div class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
       <div class="mx-auto max-w-7xl">
         <div class="flex items-center p-4 lg:p-6 pb-2 justify-between">
-          <div class="flex size-12 shrink-0 items-center justify-start">
-            <a href="../index.html">
-              <img class="size-10 lg:size-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvoEjz6rh1XARmE4qjgceA2XWgy_RWK8_nh97Czbg0G7DC9C83nzysS97gxnqqWE_ohuCqXS3PldhdL4R4As76M-PpYqUbVUyuKOBl0ay2bYTuSE6Lhfhydaw-GGN9YlzhC3al8Qy2ElytjTUn9UZEmo8-ORpideCM0ZV_O3yt7ef-mQZwfgD3zSHBoQjlKX-5rMdz-DyBqMSMkjnwALg8IZNk_cagYXep17DylalRUs05vaD_c_tiFJ0mSs16oYyRqk75iXvxC5LJ"/>
-            </a>
-          </div>
-          <h1 class="text-slate-900 dark:text-white text-lg lg:text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Solicitar Vacaciones</h1>
-          <div class="flex size-12 shrink-0 items-center justify-end">
-            <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">event</span>
-          </div>
+          <a href="../index.html" class="flex items-center gap-4">
+            <img class="h-10 lg:h-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzXkM_KUIOVVzeh5BDrH0HGTRPK27fkJTpzIqn5RXWhdp87qhApwz1viConktm7xbXWaCTWuXltnNbgZLiFHmYTE__WlVCOodGkOlNH_gYPo0mQlR9zgrkT44mOSvP8D379ZIbUEX6ipHWIEXB487rhFh9MgbLSRjPAc7KvD5bHD7wJtdlQDJRNDVF2Gho-R7rlEkhXjfFgeONiapM-AGKnFgo9HjNnFOfEnUyn0Emc0DLvBq-PvoFKj-zscz2MfUZle7t_5GYthAp"/>
+            <span class="hidden md:block text-lg lg:text-2xl font-bold text-slate-900 dark:text-white">Solicitar Vacaciones</span>
+          </a>
+          <span class="md:hidden text-lg font-bold text-slate-900 dark:text-white">Vacaciones</span>
+          <a href="perfil.html" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
+            M
+          </a>
         </div>
       </div>
     </div>
@@ -323,15 +322,17 @@
           <span class="text-xs font-bold">Vacaciones</span>
         </a>
         <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="guardias.html">
-          <span class="material-symbols-outlined">swap_horiz</span>
+          <span class="material-symbols-outlined">calendar_month</span>
           <span class="text-xs font-medium">Guardias</span>
         </a>
         <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="asignaciones.html">
-          <span class="material-symbols-outlined">assignment_ind</span>
-          <span class="text-xs font-medium">Asignación</span>
+          <span class="material-symbols-outlined">assignment</span>
+          <span class="text-xs font-medium">Áreas</span>
         </a>
         <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="perfil.html">
-          <span class="material-symbols-outlined">person</span>
+          <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white text-sm font-bold">
+            M
+          </div>
           <span class="text-xs font-medium">Perfil</span>
         </a>
       </div>
