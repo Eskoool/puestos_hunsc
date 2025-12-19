@@ -42,25 +42,41 @@
 </head>
 
 <body class="font-display bg-background-light dark:bg-background-dark">
-  <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-    <!-- Header responsivo -->
-    <header class="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10">
-      <div class="mx-auto max-w-7xl">
-        <div class="flex items-center p-4 lg:p-6">
-      <div class="flex size-12 shrink-0 items-center justify-start">
-        <a href="../index.html">
-          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCNXY89az7oPN15QUdV2RyNLXpjXo8DOJbnLX9NL4Xp6wEvFk4BC7THxUO0qxVrN1lJjIS78bAFIU2JZ-26kVYoL-q9KavrcK35Q3C5hF6QsKV4oBITKYc2Hi7lYbTfPNCGTFMSYmfhnotTwKtE2bE1Ye4dVsMMuK82l8I8rSjUwAJwKLsR8b7VDGnx4n5dJ0uDD2Zkf8M-CJ4pk-YpG5w3qIh_kg8luK3V7cFDcLESYw1lNeUt69dLa4ZQMkxYbchNC1hF_Td_yWkx");'></div>
-        </a>
-      </div>
-      <h1 class="text-[#0d171c] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Perfil</h1>
-      <div class="flex w-12 items-center justify-end">
-        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-[#0d171c] dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
-          <span class="material-symbols-outlined text-2xl">settings</span>
-        </button>
-      </div>
+  <!-- Navbar Superior -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+          <img class="h-12 w-auto" src="https://drive.google.com/uc?export=view&id=1S6INg4SoWOJsoccSDnmP92EKK3GwWeTY" alt="Logo HUNSC"/>
+          <div class="hidden md:block">
+            <h1 class="text-xl font-bold text-gray-900">Farmacia HUNSC Sur</h1>
+            <p class="text-sm text-gray-500">Sistema de Gestión</p>
+          </div>
+        </div>
+
+        <!-- Navegación Desktop -->
+        <div class="hidden lg:flex items-center gap-6">
+          <a href="../index.html" class="text-gray-600 hover:text-primary transition-colors">Dashboard</a>
+          <a href="vacaciones.html" class="text-gray-600 hover:text-primary transition-colors">Vacaciones</a>
+          <a href="guardias.html" class="text-gray-600 hover:text-primary transition-colors">Guardias</a>
+          <a href="asignaciones.html" class="text-gray-600 hover:text-primary transition-colors">Asignaciones</a>
+        </div>
+
+        <!-- User Menu -->
+        <div class="flex items-center gap-4">
+          <button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <span class="material-symbols-outlined text-gray-600">notifications</span>
+          </button>
+          <a href="perfil.html" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
+            M
+          </a>
         </div>
       </div>
-    </header>
+    </div>
+  </nav>
+
+  <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
 
     <!-- Contenedor principal con max-width -->
     <div class="mx-auto w-full max-w-7xl flex-1 pb-20 lg:pb-8">
@@ -181,5 +197,36 @@
     </main>
     </div><!-- Cierre contenedor max-w-7xl -->
   </div>
+
+  <!-- Navegación Móvil (Solo visible en móvil) -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+    <div class="grid grid-cols-5 h-16">
+      <a href="../index.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">dashboard</span>
+        <span class="text-xs mt-1">Inicio</span>
+      </a>
+      <a href="vacaciones.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">event</span>
+        <span class="text-xs mt-1">Vacaciones</span>
+      </a>
+      <a href="guardias.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">calendar_month</span>
+        <span class="text-xs mt-1">Guardias</span>
+      </a>
+      <a href="asignaciones.html" class="flex flex-col items-center justify-center text-gray-600">
+        <span class="material-symbols-outlined text-2xl">assignment</span>
+        <span class="text-xs mt-1">Áreas</span>
+      </a>
+      <a href="perfil.html" class="flex flex-col items-center justify-center text-primary">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white text-sm font-bold">
+          M
+        </div>
+        <span class="text-xs font-medium mt-1">Perfil</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Espaciado para navegación móvil -->
+  <div class="h-16 lg:hidden"></div>
 </body>
 </html>
