@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Planificación de Puestos - Admin HUNSC</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "brand-primary": "#5A0E6E",
+            "brand-accent": "#AF9100",
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%);
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .tab-btn:hover {
+      background: #f3f4f6;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #5A0E6E 0%, #7B2D8E 100%);
+      color: white;
+    }
+    .week-day {
+      min-height: 120px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px;
+      transition: all 0.2s;
+    }
+    .week-day:hover {
+      background: #f9fafb;
+      border-color: #5A0E6E;
+    }
+    .assignment-badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .assignment-badge:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .gradient-purple {
+      background: linear-gradient(135deg, #5A0E6E 0%, #7B2D8E 100%);
+    }
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #10B981;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .template-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .template-card:hover {
+      border-color: #5A0E6E;
+      background: #f9fafb;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-4">
+          <a href="admin-dashboard.html" class="material-symbols-outlined text-gray-600 hover:text-brand-primary">arrow_back</a>
+          <div>
+            <h1 class="text-xl font-bold text-gray-900">Planificación de Puestos de Trabajo</h1>
+            <p class="text-sm text-gray-500">Gestión inteligente por calendario</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Tabs de Vista -->
+    <div class="card p-4 mb-8">
+      <div class="flex flex-wrap gap-3">
+        <button onclick="switchTab('rapida')" id="tab-rapida" class="tab-btn active">
+          <span class="material-symbols-outlined align-middle">flash_on</span>
+          Asignación Rápida
+        </button>
+        <button onclick="switchTab('calendario')" id="tab-calendario" class="tab-btn">
+          <span class="material-symbols-outlined align-middle">calendar_month</span>
+          Vista Calendario
+        </button>
+        <button onclick="switchTab('plantillas')" id="tab-plantillas" class="tab-btn">
+          <span class="material-symbols-outlined align-middle">folder_copy</span>
+          Plantillas
+        </button>
+      </div>
+    </div>
+
+    <!-- VISTA 1: Asignación Rápida (Drag & Drop Simple) -->
+    <div id="view-rapida" class="view-container">
+      <div class="card p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold text-gray-900">Asignación Rápida para Hoy</h2>
+          <div class="flex items-center gap-3">
+            <input type="date" id="quick-date" class="px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"/>
+            <button onclick="saveQuickAssignments()" class="gradient-purple text-white px-6 py-2 rounded-xl font-semibold hover:opacity-90">
+              Guardar Asignación
+            </button>
+          </div>
+        </div>
+        <p class="text-gray-600 mb-6">Arrastra personal a los puestos para asignarlos al día seleccionado</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="quick-assignment-grid">
+          <!-- Personal y Puestos se cargan aquí -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 2: Calendario Semanal -->
+    <div id="view-calendario" class="view-container hidden">
+
+      <!-- Controles de Calendario -->
+      <div class="card p-6 mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <button onclick="changeWeek(-1)" class="p-2 hover:bg-gray-100 rounded-full">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-900" id="week-title">Semana del ...</h2>
+            <button onclick="changeWeek(1)" class="p-2 hover:bg-gray-100 rounded-full">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+            <button onclick="goToToday()" class="px-4 py-2 bg-gray-100 rounded-xl text-sm font-semibold hover:bg-gray-200">
+              Hoy
+            </button>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button onclick="copyWeek()" class="px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold hover:opacity-90 flex items-center gap-2">
+              <span class="material-symbols-outlined text-lg">content_copy</span>
+              Copiar Semana
+            </button>
+            <button onclick="pasteWeek()" class="px-4 py-2 bg-green-500 text-white rounded-xl font-semibold hover:opacity-90 flex items-center gap-2" id="paste-btn" disabled>
+              <span class="material-symbols-outlined text-lg">content_paste</span>
+              Pegar
+            </button>
+            <button onclick="clearWeek()" class="px-4 py-2 bg-red-500 text-white rounded-xl font-semibold hover:opacity-90 flex items-center gap-2">
+              <span class="material-symbols-outlined text-lg">delete</span>
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid Semanal -->
+      <div class="card p-6">
+        <div class="grid grid-cols-7 gap-2 mb-4">
+          <div class="text-center font-bold text-gray-700">Lun</div>
+          <div class="text-center font-bold text-gray-700">Mar</div>
+          <div class="text-center font-bold text-gray-700">Mié</div>
+          <div class="text-center font-bold text-gray-700">Jue</div>
+          <div class="text-center font-bold text-gray-700">Vie</div>
+          <div class="text-center font-bold text-gray-700">Sáb</div>
+          <div class="text-center font-bold text-gray-700">Dom</div>
+        </div>
+
+        <div class="grid grid-cols-7 gap-2" id="week-grid">
+          <!-- Días de la semana se cargan aquí -->
+        </div>
+      </div>
+
+      <!-- Panel de Asignación -->
+      <div class="card p-6 mt-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Asignar Personal</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Personal</label>
+            <select id="cal-person" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Puesto</label>
+            <select id="cal-puesto" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary">
+              <option value="">Seleccionar...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Días</label>
+            <div class="flex items-center gap-2">
+              <input type="date" id="cal-start-date" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"/>
+              <span>a</span>
+              <input type="date" id="cal-end-date" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Días de la semana</label>
+          <div class="flex flex-wrap gap-2">
+            <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
+              <input type="checkbox" value="1" class="weekday-check"/> Lunes
+            </label>
+            <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
+              <input type="checkbox" value="2" class="weekday-check"/> Martes
+            </label>
+            <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
+              <input type="checkbox" value="3" class="weekday-check"/> Miércoles
+            </label>
+            <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
+              <input type="checkbox" value="4" class="weekday-check"/> Jueves
+            </label>
+            <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
+              <input type="checkbox" value="5" class="weekday-check"/> Viernes
+            </label>
+            <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
+              <input type="checkbox" value="6" class="weekday-check"/> Sábado
+            </label>
+            <label class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200">
+              <input type="checkbox" value="0" class="weekday-check"/> Domingo
+            </label>
+          </div>
+        </div>
+
+        <button onclick="assignToCalendar()" class="mt-4 gradient-purple text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90">
+          Asignar a Fechas Seleccionadas
+        </button>
+      </div>
+    </div>
+
+    <!-- VISTA 3: Plantillas -->
+    <div id="view-plantillas" class="view-container hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Crear Nueva Plantilla -->
+        <div class="card p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Crear Plantilla</h2>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de la Plantilla</label>
+              <input type="text" id="template-name" placeholder="Ej: Semana Normal Enero" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"/>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción</label>
+              <textarea id="template-desc" rows="3" placeholder="Describe esta configuración..." class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Copiar desde</label>
+              <select id="template-source" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary">
+                <option value="current">Semana Actual en Calendario</option>
+                <option value="range">Rango de Fechas Específico</option>
+              </select>
+            </div>
+
+            <button onclick="saveTemplate()" class="w-full gradient-purple text-white py-4 rounded-xl font-semibold hover:opacity-90">
+              Guardar Plantilla
+            </button>
+          </div>
+        </div>
+
+        <!-- Plantillas Guardadas -->
+        <div class="card p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Plantillas Guardadas</h2>
+
+          <div id="templates-list" class="space-y-3">
+            <!-- Plantillas se cargan aquí -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Datos
+    const personalData = [
+      { id: 1, name: 'Ana Pérez García', role: 'Farmacéutica Adjunta' },
+      { id: 2, name: 'Juan Rodríguez', role: 'Técnico de Farmacia' },
+      { id: 3, name: 'María Sanz', role: 'Farmacéutica Residente (FIR)' },
+      { id: 4, name: 'Laura Gómez', role: 'Farmacéutica Especialista' },
+      { id: 5, name: 'Carlos Vega', role: 'Técnico Superior' },
+      { id: 6, name: 'Pedro Martín', role: 'Farmacéutico Adjunto' },
+    ];
+
+    const puestosData = [
+      { id: 'unidosis-manana', name: 'Unidosis - Turno Mañana', color: 'purple' },
+      { id: 'unidosis-tarde', name: 'Unidosis - Turno Tarde', color: 'purple' },
+      { id: 'farmacotecnia', name: 'Farmacotecnia - Preparación', color: 'green' },
+      { id: 'nutricion', name: 'Nutrición Parenteral', color: 'amber' },
+      { id: 'dispensacion', name: 'Dispensación Ambulatoria', color: 'blue' },
+    ];
+
+    const colorConfig = {
+      purple: '#8B5CF6',
+      green: '#10B981',
+      amber: '#F59E0B',
+      blue: '#3B82F6'
+    };
+
+    // Estado global
+    let currentTab = 'rapida';
+    let currentWeekStart = new Date();
+    let assignments = {}; // { '2024-12-30': { 'unidosis-manana': 1, ... } }
+    let copiedWeek = null;
+    let templates = [];
+
+    // Inicializar
+    function init() {
+      setTodayDate();
+      loadPersonalSelects();
+      loadPuestosSelects();
+      renderQuickAssignment();
+      renderWeek();
+      renderTemplates();
+    }
+
+    function setTodayDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('quick-date').value = today;
+
+      // Setear fecha de inicio al lunes de esta semana
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      currentWeekStart = new Date(now);
+      currentWeekStart.setDate(now.getDate() + diff);
+      currentWeekStart.setHours(0, 0, 0, 0);
+    }
+
+    function loadPersonalSelects() {
+      const select = document.getElementById('cal-person');
+      select.innerHTML = '<option value="">Seleccionar...</option>';
+      personalData.forEach(p => {
+        select.innerHTML += `<option value="${p.id}">${p.name} - ${p.role}</option>`;
+      });
+    }
+
+    function loadPuestosSelects() {
+      const select = document.getElementById('cal-puesto');
+      select.innerHTML = '<option value="">Seleccionar...</option>';
+      puestosData.forEach(p => {
+        select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+      });
+    }
+
+    // TAB SWITCHING
+    function switchTab(tab) {
+      currentTab = tab;
+
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+
+      // Update views
+      document.querySelectorAll('.view-container').forEach(view => view.classList.add('hidden'));
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+
+      if (tab === 'calendario') {
+        renderWeek();
+      } else if (tab === 'plantillas') {
+        renderTemplates();
+      } else if (tab === 'rapida') {
+        renderQuickAssignment();
+      }
+    }
+
+    // VISTA 1: Asignación Rápida
+    function renderQuickAssignment() {
+      const container = document.getElementById('quick-assignment-grid');
+      const selectedDate = document.getElementById('quick-date').value;
+
+      const dayAssignments = assignments[selectedDate] || {};
+
+      let html = '<div class="space-y-3">';
+      html += '<h3 class="font-bold text-lg">Personal Disponible</h3>';
+      personalData.forEach(person => {
+        html += `
+          <div class="p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
+            <div class="font-semibold">${person.name}</div>
+            <div class="text-sm text-gray-600">${person.role}</div>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      html += '<div class="space-y-3">';
+      html += '<h3 class="font-bold text-lg">Puestos del Día</h3>';
+      puestosData.forEach(puesto => {
+        const assignedPersonId = dayAssignments[puesto.id];
+        const assignedPerson = assignedPersonId ? personalData.find(p => p.id === assignedPersonId) : null;
+
+        html += `
+          <div class="p-4 rounded-xl border-2" style="border-color: ${colorConfig[puesto.color]}; background: ${colorConfig[puesto.color]}15">
+            <div class="flex items-center justify-between mb-3">
+              <div class="font-semibold">${puesto.name}</div>
+              ${assignedPerson ? `
+                <button onclick="removeQuickAssignment('${selectedDate}', '${puesto.id}')" class="text-red-500 hover:text-red-700">
+                  <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+              ` : ''}
+            </div>
+            <select onchange="assignQuick('${selectedDate}', '${puesto.id}', this.value)" class="w-full px-4 py-2 border border-gray-300 rounded-xl">
+              <option value="">Sin asignar</option>
+              ${personalData.map(p => `
+                <option value="${p.id}" ${assignedPersonId === p.id ? 'selected' : ''}>${p.name}</option>
+              `).join('')}
+            </select>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      container.innerHTML = html;
+    }
+
+    function assignQuick(date, puestoId, personId) {
+      if (!assignments[date]) assignments[date] = {};
+
+      if (personId) {
+        assignments[date][puestoId] = parseInt(personId);
+        showNotification(`✅ Asignación guardada para ${date}`);
+      } else {
+        delete assignments[date][puestoId];
+      }
+
+      renderQuickAssignment();
+    }
+
+    function removeQuickAssignment(date, puestoId) {
+      if (assignments[date]) {
+        delete assignments[date][puestoId];
+        renderQuickAssignment();
+        showNotification(`🔄 Asignación eliminada`);
+      }
+    }
+
+    function saveQuickAssignments() {
+      showNotification(`✅ Asignaciones guardadas correctamente`);
+    }
+
+    // VISTA 2: Calendario
+    function renderWeek() {
+      const weekTitle = document.getElementById('week-title');
+      const weekGrid = document.getElementById('week-grid');
+
+      const endDate = new Date(currentWeekStart);
+      endDate.setDate(endDate.getDate() + 6);
+
+      weekTitle.textContent = `Semana del ${formatDate(currentWeekStart)} al ${formatDate(endDate)}`;
+
+      let html = '';
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(currentWeekStart);
+        day.setDate(day.getDate() + i);
+        const dateStr = day.toISOString().split('T')[0];
+        const dayAssignments = assignments[dateStr] || {};
+
+        const isToday = dateStr === new Date().toISOString().split('T')[0];
+
+        html += `
+          <div class="week-day ${isToday ? 'bg-blue-50 border-blue-300' : ''}" onclick="selectDay('${dateStr}')">
+            <div class="text-center font-bold text-sm mb-2">${day.getDate()}</div>
+            <div class="space-y-1">
+              ${Object.keys(dayAssignments).map(puestoId => {
+                const personId = dayAssignments[puestoId];
+                const person = personalData.find(p => p.id === personId);
+                const puesto = puestosData.find(p => p.id === puestoId);
+                if (!person || !puesto) return '';
+
+                return `
+                  <div class="assignment-badge" style="background: ${colorConfig[puesto.color]}; color: white;">
+                    ${person.name.split(' ')[0]}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      weekGrid.innerHTML = html;
+    }
+
+    function changeWeek(delta) {
+      currentWeekStart.setDate(currentWeekStart.getDate() + (delta * 7));
+      renderWeek();
+    }
+
+    function goToToday() {
+      setTodayDate();
+      renderWeek();
+    }
+
+    function selectDay(dateStr) {
+      document.getElementById('cal-start-date').value = dateStr;
+      document.getElementById('cal-end-date').value = dateStr;
+    }
+
+    function assignToCalendar() {
+      const personId = parseInt(document.getElementById('cal-person').value);
+      const puestoId = document.getElementById('cal-puesto').value;
+      const startDate = new Date(document.getElementById('cal-start-date').value);
+      const endDate = new Date(document.getElementById('cal-end-date').value);
+
+      if (!personId || !puestoId || !startDate || !endDate) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
+
+      const selectedWeekdays = Array.from(document.querySelectorAll('.weekday-check:checked')).map(cb => parseInt(cb.value));
+
+      let count = 0;
+      const current = new Date(startDate);
+
+      while (current <= endDate) {
+        const shouldAssign = selectedWeekdays.length === 0 || selectedWeekdays.includes(current.getDay());
+
+        if (shouldAssign) {
+          const dateStr = current.toISOString().split('T')[0];
+          if (!assignments[dateStr]) assignments[dateStr] = {};
+          assignments[dateStr][puestoId] = personId;
+          count++;
+        }
+
+        current.setDate(current.getDate() + 1);
+      }
+
+      renderWeek();
+      showNotification(`✅ ${count} asignaciones creadas`);
+    }
+
+    function copyWeek() {
+      const weekData = {};
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(currentWeekStart);
+        day.setDate(day.getDate() + i);
+        const dateStr = day.toISOString().split('T')[0];
+        if (assignments[dateStr]) {
+          weekData[i] = { ...assignments[dateStr] };
+        }
+      }
+      copiedWeek = weekData;
+      document.getElementById('paste-btn').disabled = false;
+      showNotification(`📋 Semana copiada al portapapeles`);
+    }
+
+    function pasteWeek() {
+      if (!copiedWeek) return;
+
+      let count = 0;
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(currentWeekStart);
+        day.setDate(day.getDate() + i);
+        const dateStr = day.toISOString().split('T')[0];
+
+        if (copiedWeek[i]) {
+          assignments[dateStr] = { ...copiedWeek[i] };
+          count++;
+        }
+      }
+
+      renderWeek();
+      showNotification(`✅ Semana pegada (${count} días)`);
+    }
+
+    function clearWeek() {
+      if (!confirm('¿Eliminar todas las asignaciones de esta semana?')) return;
+
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(currentWeekStart);
+        day.setDate(day.getDate() + i);
+        const dateStr = day.toISOString().split('T')[0];
+        delete assignments[dateStr];
+      }
+
+      renderWeek();
+      showNotification(`🗑️ Semana limpiada`);
+    }
+
+    // VISTA 3: Plantillas
+    function saveTemplate() {
+      const name = document.getElementById('template-name').value.trim();
+      const desc = document.getElementById('template-desc').value.trim();
+
+      if (!name) {
+        alert('Ingresa un nombre para la plantilla');
+        return;
+      }
+
+      const templateData = {};
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(currentWeekStart);
+        day.setDate(day.getDate() + i);
+        const dateStr = day.toISOString().split('T')[0];
+        if (assignments[dateStr]) {
+          templateData[i] = { ...assignments[dateStr] };
+        }
+      }
+
+      templates.push({
+        id: Date.now(),
+        name: name,
+        description: desc,
+        data: templateData,
+        created: new Date().toISOString()
+      });
+
+      document.getElementById('template-name').value = '';
+      document.getElementById('template-desc').value = '';
+
+      renderTemplates();
+      showNotification(`✅ Plantilla "${name}" guardada`);
+    }
+
+    function renderTemplates() {
+      const container = document.getElementById('templates-list');
+
+      if (templates.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No hay plantillas guardadas</p>';
+        return;
+      }
+
+      container.innerHTML = templates.map(template => `
+        <div class="template-card">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <h4 class="font-bold text-lg">${template.name}</h4>
+              <p class="text-sm text-gray-600">${template.description || 'Sin descripción'}</p>
+              <p class="text-xs text-gray-400 mt-1">Creado: ${new Date(template.created).toLocaleDateString('es-ES')}</p>
+            </div>
+            <button onclick="deleteTemplate(${template.id})" class="text-red-500 hover:text-red-700">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+          <button onclick="applyTemplate(${template.id})" class="w-full mt-3 px-4 py-2 bg-brand-primary text-white rounded-xl font-semibold hover:opacity-90">
+            Aplicar a Semana Actual
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function applyTemplate(templateId) {
+      const template = templates.find(t => t.id === templateId);
+      if (!template) return;
+
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(currentWeekStart);
+        day.setDate(day.getDate() + i);
+        const dateStr = day.toISOString().split('T')[0];
+
+        if (template.data[i]) {
+          assignments[dateStr] = { ...template.data[i] };
+        }
+      }
+
+      switchTab('calendario');
+      renderWeek();
+      showNotification(`✅ Plantilla "${template.name}" aplicada`);
+    }
+
+    function deleteTemplate(templateId) {
+      if (!confirm('¿Eliminar esta plantilla?')) return;
+      templates = templates.filter(t => t.id !== templateId);
+      renderTemplates();
+      showNotification(`🗑️ Plantilla eliminada`);
+    }
+
+    // Utilidades
+    function formatDate(date) {
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' });
+    }
+
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
+    }
+
+    // Inicializar
+    init();
+  </script>
+</body>
+</html>
