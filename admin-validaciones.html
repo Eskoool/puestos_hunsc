@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -23,12 +22,73 @@
   </script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%); }
-    .card { background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-    .draggable-item { cursor: move; transition: all 0.2s; }
-    .draggable-item:hover { transform: scale(1.02); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-    .drop-zone { min-height: 400px; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 16px; }
-    .drop-zone.drag-over { background: #f0f9ff; border-color: #3b82f6; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%);
+      min-height: 100vh;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .draggable-item {
+      cursor: grab;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .draggable-item:active {
+      cursor: grabbing;
+    }
+    .draggable-item:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+    }
+    .draggable-item.dragging {
+      opacity: 0.5;
+      transform: rotate(3deg);
+    }
+    .drop-zone {
+      min-height: 120px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      transition: all 0.3s ease;
+    }
+    .drop-zone.drag-over {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      border-width: 3px;
+      transform: scale(1.02);
+    }
+    .drop-zone:empty::before {
+      content: 'Arrastra personal aquí';
+      display: block;
+      text-align: center;
+      color: #9ca3af;
+      padding: 32px 0;
+      font-size: 14px;
+    }
+    .gradient-purple {
+      background: linear-gradient(135deg, #5A0E6E 0%, #7B2D8E 100%);
+    }
+    .assigned-staff {
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
@@ -38,77 +98,67 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
         <div class="flex items-center gap-4">
-          <a href="admin-dashboard.html" class="material-symbols-outlined text-gray-600 hover:text-brand-primary">arrow_back</a>
+          <a href="admin-dashboard.html" class="material-symbols-outlined text-gray-600 hover:text-brand-primary transition-colors">arrow_back</a>
           <div>
             <h1 class="text-xl font-bold text-gray-900">Gestión de Validaciones</h1>
-            <p class="text-sm text-gray-500">Asignar personal a plantas</p>
+            <p class="text-sm text-gray-500">Asignar personal a plantas (Drag & Drop)</p>
           </div>
         </div>
-        <button class="gradient-purple text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
-          <span class="material-symbols-outlined">add</span>
-          Nueva Planta
-        </button>
+
+        <!-- Toggle Vista -->
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
+            <button id="btn-pendientes" onclick="toggleView('pendientes')" class="px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-brand-primary text-white">
+              Solo Pendientes
+            </button>
+            <button id="btn-todas" onclick="toggleView('todas')" class="px-4 py-2 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-gray-200">
+              Todas las Plantas
+            </button>
+          </div>
+          <button onclick="addNewPlanta()" class="gradient-purple text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+            <span class="material-symbols-outlined">add</span>
+            Nueva Planta
+          </button>
+        </div>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
     <!-- Instrucciones -->
-    <div class="card p-6 mb-8 bg-blue-50 border-2 border-blue-200">
-      <div class="flex items-start gap-4">
-        <span class="material-symbols-outlined text-blue-600 text-3xl">info</span>
+    <div class="card p-4 mb-6 bg-blue-50 border-2 border-blue-200">
+      <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-blue-600 text-2xl">info</span>
         <div>
-          <h3 class="font-bold text-gray-900 mb-2">¿Cómo funciona?</h3>
-          <p class="text-gray-700">Arrastra los usuarios disponibles desde la izquierda hacia las plantas de hospitalización de la derecha para asignarlos. También puedes hacer clic en un usuario para ver su historial.</p>
+          <p class="text-sm text-gray-700"><strong>💡 Drag & Drop:</strong> Arrastra personal desde la izquierda a las plantas de la derecha. Los cambios se guardan automáticamente.</p>
         </div>
       </div>
     </div>
 
     <!-- Layout de Drag & Drop -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      
+
       <!-- IZQUIERDA: Personal Disponible -->
       <div class="card p-6">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-gray-900">Personal Disponible</h2>
-          <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">12 disponibles</span>
+          <span id="count-disponible" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">12 disponibles</span>
         </div>
 
         <div class="mb-4">
-          <input type="text" placeholder="Buscar personal..." class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent"/>
+          <input
+            type="text"
+            id="search-personal"
+            placeholder="🔍 Buscar personal..."
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+            oninput="filterPersonal()"
+          />
         </div>
 
         <div id="personal-disponible" class="space-y-3">
-          <!-- Usuario 1 -->
-          <div class="draggable-item card p-4 flex items-center gap-4 cursor-move hover:shadow-lg" draggable="true" data-user-id="1">
-            <img class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKcxXJ0Vv5sAbJssDPgvEKn4I1b0IJ-Ip5OhDGYYw1pGuYwngNtRoWg-USkuAzwyAHqtdHv-5iTmXD_BZDIxZBvqDUNwSH72a7v0MJuKNlwnQ4J1HtQLEyrB5bzwYcnj2TuNYIAcaPMbRo6w8akD3h_TcKmxqUNwWcIEPNEOmC8DO8pNa1TlqmZhFN7AWUcChCvPw3mhBtQzgH0_fLK7N6Pp30rDCgkA1yeLLanDZgLRt4pVHquAeAmy8V-WxulVJnaJsqPEoxxeWx"/>
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-900">Ana Pérez García</h3>
-              <p class="text-sm text-gray-600">Farmacéutica Adjunta</p>
-            </div>
-            <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
-          </div>
-
-          <!-- Usuario 2 -->
-          <div class="draggable-item card p-4 flex items-center gap-4 cursor-move hover:shadow-lg" draggable="true" data-user-id="2">
-            <img class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0Edi8pih2GyECwimRH89FeVlPa2hezMz99SmXdrE2bHNQ3Ae9FPhqqanglLZlLGoiDbaS5abHArR3waKfZ1ssKAAyGyTSnBpZqfGLNkq35R3Pca3-_xpYeM1kxYdVV8PCjZStANadEv2wX8vMGjYGNggzLrIw_swVeFqY6FmJ2lPwQuKp7zLt1UL1GfOlDp0CFUC-2iYCjaVak5e3KApBEnTC0k1S9sOnhuUPA_veQ_U8w28GGu7LEq-3O4ttnNTZtXraY1XFyE5"/>
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-900">Juan Rodríguez López</h3>
-              <p class="text-sm text-gray-600">Técnico de Farmacia</p>
-            </div>
-            <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
-          </div>
-
-          <!-- Usuario 3 -->
-          <div class="draggable-item card p-4 flex items-center gap-4 cursor-move hover:shadow-lg" draggable="true" data-user-id="3">
-            <img class="w-12 h-12 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMy3jkAR_XprfClLjZNXa1mWZCVbdtAt7BB7QroDSagGOy3TD15buDYKjbATD5tCcEkvqU2ZsZQlGPVLOV1Nn9XZ0EqEUMkj4BRGSCIFCqfZyVxBtMJ9Egm-E6nxWHCtuc6zVAX7bjrNHvnopfqUYm5Jz3fVlD3mQHzVWK0HjaDwQfj9jTnIDv19TT-njxO0u_kZNOSNh2G-T1dvTU4JkhQZoT_0FijE6PvUBZf3XBsj1-VUHIokYYJDYKBQ-szEH11BX7QECLVazY"/>
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-900">María Fernández Sanz</h3>
-              <p class="text-sm text-gray-600">Farmacéutica Residente</p>
-            </div>
-            <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
-          </div>
+          <!-- Se genera dinámicamente -->
         </div>
       </div>
 
@@ -116,132 +166,301 @@
       <div class="card p-6">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-gray-900">Plantas de Hospitalización</h2>
-          <span class="px-3 py-1 bg-brand-primary text-white rounded-full text-sm font-semibold">8 plantas</span>
+          <div class="flex items-center gap-2">
+            <span id="count-pendientes" class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">3 pendientes</span>
+            <span id="count-plantas" class="px-3 py-1 bg-brand-primary text-white rounded-full text-sm font-semibold">8 plantas</span>
+          </div>
         </div>
 
-        <div class="space-y-4">
-          <!-- Planta 1: Cardiología -->
-          <div class="border-2 border-purple-200 rounded-xl p-4 bg-purple-50">
-            <div class="flex items-center justify-between mb-3">
-              <div>
-                <h3 class="font-bold text-gray-900">Planta 3 - Cardiología</h3>
-                <p class="text-sm text-gray-600">Capacidad: 0/2</p>
-              </div>
-              <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Sin cubrir</span>
-            </div>
-            <div id="planta-3" class="drop-zone bg-white" data-planta="Planta 3 - Cardiología">
-              <p class="text-center text-gray-400 py-8">Arrastra personal aquí</p>
-            </div>
-          </div>
-
-          <!-- Planta 2: Oncología -->
-          <div class="border-2 border-purple-200 rounded-xl p-4 bg-purple-50">
-            <div class="flex items-center justify-between mb-3">
-              <div>
-                <h3 class="font-bold text-gray-900">Planta 5 - Oncología</h3>
-                <p class="text-sm text-gray-600">Capacidad: 1/2</p>
-              </div>
-              <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">Parcial</span>
-            </div>
-            <div id="planta-5" class="drop-zone bg-white" data-planta="Planta 5 - Oncología">
-              <!-- Personal ya asignado -->
-              <div class="card p-3 mb-2 flex items-center gap-3">
-                <img class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClAbU252hJ8EY8HBvQLr9HP4rEQVkKjOjksGvwzpXFZFv_J7Fi4_FBcp8susvjYggXf5nYHgdl0OrpthD7X0bcMDdovV_a_HZhMcM-SSyZeS4DT1oxUZJNK-GxNpvfIdoHjviCRgInOTkynsXi2E0UCek0YJoxvAUvP38KfPJVXSxdGu2bD2ev2zkumJ7iyA5Qv2hy7iT3j_7WbjgAXUSP6mmRiIEaECkT1yL433PPM-dXdX9WmqeiYvfK0TPof4Q0EwOxBZaBBWo8"/>
-                <div class="flex-1">
-                  <h4 class="font-semibold text-sm">Laura Gómez</h4>
-                  <p class="text-xs text-gray-600">Asignada</p>
-                </div>
-                <button class="text-red-500 hover:text-red-700">
-                  <span class="material-symbols-outlined text-sm">close</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Planta 3: UCI -->
-          <div class="border-2 border-green-200 rounded-xl p-4 bg-green-50">
-            <div class="flex items-center justify-between mb-3">
-              <div>
-                <h3 class="font-bold text-gray-900">Planta 7 - UCI</h3>
-                <p class="text-sm text-gray-600">Capacidad: 2/2</p>
-              </div>
-              <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Completo</span>
-            </div>
-            <div id="planta-7" class="drop-zone bg-white" data-planta="Planta 7 - UCI">
-              <div class="card p-3 mb-2 flex items-center gap-3">
-                <img class="w-10 h-10 rounded-full" src="https://via.placeholder.com/40"/>
-                <div class="flex-1">
-                  <h4 class="font-semibold text-sm">Carlos Vega</h4>
-                  <p class="text-xs text-gray-600">Asignado</p>
-                </div>
-                <button class="text-red-500 hover:text-red-700">
-                  <span class="material-symbols-outlined text-sm">close</span>
-                </button>
-              </div>
-              <div class="card p-3 flex items-center gap-3">
-                <img class="w-10 h-10 rounded-full" src="https://via.placeholder.com/40"/>
-                <div class="flex-1">
-                  <h4 class="font-semibold text-sm">Sofía Martín</h4>
-                  <p class="text-xs text-gray-600">Asignada</p>
-                </div>
-                <button class="text-red-500 hover:text-red-700">
-                  <span class="material-symbols-outlined text-sm">close</span>
-                </button>
-              </div>
-            </div>
-          </div>
+        <div id="plantas-container" class="space-y-4">
+          <!-- Se genera dinámicamente -->
         </div>
       </div>
     </div>
 
-    <!-- Botón Guardar -->
-    <div class="mt-8 flex justify-end gap-4">
-      <button class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
-        Cancelar
-      </button>
-      <button class="px-6 py-3 gradient-purple text-white rounded-xl font-semibold hover:opacity-90 transition-opacity">
-        Guardar Asignaciones
-      </button>
+    <!-- Estadísticas -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+      <div class="card p-4">
+        <p class="text-sm text-gray-600 mb-1">Personal Asignado</p>
+        <p id="stat-asignado" class="text-3xl font-bold text-brand-primary">5</p>
+      </div>
+      <div class="card p-4">
+        <p class="text-sm text-gray-600 mb-1">Sin Asignar</p>
+        <p id="stat-disponible" class="text-3xl font-bold text-green-600">12</p>
+      </div>
+      <div class="card p-4">
+        <p class="text-sm text-gray-600 mb-1">Plantas Completas</p>
+        <p id="stat-completas" class="text-3xl font-bold text-blue-600">3</p>
+      </div>
+      <div class="card p-4">
+        <p class="text-sm text-gray-600 mb-1">Plantas Pendientes</p>
+        <p id="stat-pendientes" class="text-3xl font-bold text-amber-600">3</p>
+      </div>
     </div>
   </main>
 
   <script>
-    // Funcionalidad Drag & Drop básica
-    const draggables = document.querySelectorAll('.draggable-item');
-    const dropZones = document.querySelectorAll('.drop-zone');
+    // Datos iniciales
+    const personalData = [
+      { id: 1, name: 'Ana Pérez García', role: 'Farmacéutica Adjunta', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCKcxXJ0Vv5sAbJssDPgvEKn4I1b0IJ-Ip5OhDGYYw1pGuYwngNtRoWg-USkuAzwyAHqtdHv-5iTmXD_BZDIxZBvqDUNwSH72a7v0MJuKNlwnQ4J1HtQLEyrB5bzwYcnj2TuNYIAcaPMbRo6w8akD3h_TcKmxqUNwWcIEPNEOmC8DO8pNa1TlqmZhFN7AWUcChCvPw3mhBtQzgH0_fLK7N6Pp30rDCgkA1yeLLanDZgLRt4pVHquAeAmy8V-WxulVJnaJsqPEoxxeWx' },
+      { id: 2, name: 'Juan Rodríguez López', role: 'Técnico de Farmacia', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCe0Edi8pih2GyECwimRH89FeVlPa2hezMz99SmXdrE2bHNQ3Ae9FPhqqanglLZlLGoiDbaS5abHArR3waKfZ1ssKAAyGyTSnBpZqfGLNkq35R3Pca3-_xpYeM1kxYdVV8PCjZStANadEv2wX8vMGjYGNggzLrIw_swVeFqY6FmJ2lPwQuKp7zLt1UL1GfOlDp0CFUC-2iYCjaVak5e3KApBEnTC0k1S9sOnhuUPA_veQ_U8w28GGu7LEq-3O4ttnNTZtXraY1XFyE5' },
+      { id: 3, name: 'María Fernández Sanz', role: 'Farmacéutica Residente', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAMy3jkAR_XprfClLjZNXa1mWZCVbdtAt7BB7QroDSagGOy3TD15buDYKjbATD5tCcEkvqU2ZsZQlGPVLOV1Nn9XZ0EqEUMkj4BRGSCIFCqfZyVxBtMJ9Egm-E6nxWHCtuc6zVAX7bjrNHvnopfqUYm5Jz3fVlD3mQHzVWK0HjaDwQfj9jTnIDv19TT-njxO0u_kZNOSNh2G-T1dvTU4JkhQZoT_0FijE6PvUBZf3XBsj1-VUHIokYYJDYKBQ-szEH11BX7QECLVazY' },
+      { id: 4, name: 'Pedro Martín Ruiz', role: 'Farmacéutico', avatar: 'https://via.placeholder.com/48' },
+      { id: 5, name: 'Laura Gómez Díaz', role: 'Técnico Superior', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuClAbU252hJ8EY8HBvQLr9HP4rEQVkKjOjksGvwzpXFZFv_J7Fi4_FBcp8susvjYggXf5nYHgdl0OrpthD7X0bcMDdovV_a_HZhMcM-SSyZeS4DT1oxUZJNK-GxNpvfIdoHjviCRgInOTkynsXi2E0UCek0YJoxvAUvP38KfPJVXSxdGu2bD2ev2zkumJ7iyA5Qv2hy7iT3j_7WbjgAXUSP6mmRiIEaECkT1yL433PPM-dXdX9WmqeiYvfK0TPof4Q0EwOxBZaBBWo8' },
+      { id: 6, name: 'Carlos Vega Torres', role: 'Farmacéutico Adjunto', avatar: 'https://via.placeholder.com/48' },
+      { id: 7, name: 'Sofía Martín López', role: 'Farmacéutica', avatar: 'https://via.placeholder.com/48' },
+      { id: 8, name: 'Diego Fernández Gil', role: 'Técnico de Farmacia', avatar: 'https://via.placeholder.com/48' },
+      { id: 9, name: 'Isabel García Ruiz', role: 'Farmacéutica Residente', avatar: 'https://via.placeholder.com/48' },
+      { id: 10, name: 'Miguel Ángel Sanz', role: 'Técnico Superior', avatar: 'https://via.placeholder.com/48' },
+      { id: 11, name: 'Elena Rodríguez Pérez', role: 'Farmacéutica', avatar: 'https://via.placeholder.com/48' },
+      { id: 12, name: 'Roberto López Castro', role: 'Técnico de Farmacia', avatar: 'https://via.placeholder.com/48' }
+    ];
 
-    draggables.forEach(draggable => {
-      draggable.addEventListener('dragstart', () => {
-        draggable.classList.add('opacity-50');
+    const plantasData = [
+      { id: 'planta-3', name: 'Planta 3 - Cardiología', capacity: 2, assigned: [], pending: true },
+      { id: 'planta-4', name: 'Planta 4 - Neurología', capacity: 2, assigned: [], pending: true },
+      { id: 'planta-5', name: 'Planta 5 - Oncología', capacity: 2, assigned: [5], pending: true },
+      { id: 'planta-6', name: 'Planta 6 - Traumatología', capacity: 3, assigned: [], pending: true },
+      { id: 'planta-7', name: 'Planta 7 - UCI', capacity: 2, assigned: [6, 7], pending: false },
+      { id: 'planta-8', name: 'Planta 8 - Medicina Interna', capacity: 3, assigned: [8, 9, 10], pending: false },
+      { id: 'planta-9', name: 'Planta 9 - Cirugía', capacity: 2, assigned: [11, 12], pending: false },
+      { id: 'planta-10', name: 'Planta 10 - Pediatría', capacity: 2, assigned: [], pending: true }
+    ];
+
+    let currentView = 'pendientes';
+    let draggedElement = null;
+
+    function init() {
+      renderPersonal();
+      renderPlantas();
+      updateStats();
+    }
+
+    function getAvailablePersonal() {
+      const assignedIds = new Set();
+      plantasData.forEach(planta => {
+        planta.assigned.forEach(id => assignedIds.add(id));
+      });
+      return personalData.filter(person => !assignedIds.has(person.id));
+    }
+
+    function renderPersonal() {
+      const container = document.getElementById('personal-disponible');
+      const available = getAvailablePersonal();
+
+      container.innerHTML = available.map(person => `
+        <div class="draggable-item card p-4 flex items-center gap-4"
+             draggable="true"
+             data-user-id="${person.id}"
+             ondragstart="handleDragStart(event, ${person.id})"
+             ondragend="handleDragEnd(event)">
+          <img class="w-12 h-12 rounded-full" src="${person.avatar}" alt="${person.name}"/>
+          <div class="flex-1">
+            <h3 class="font-semibold text-gray-900">${person.name}</h3>
+            <p class="text-sm text-gray-600">${person.role}</p>
+          </div>
+          <span class="material-symbols-outlined text-gray-400">drag_indicator</span>
+        </div>
+      `).join('');
+
+      document.getElementById('count-disponible').textContent = `${available.length} disponibles`;
+    }
+
+    function renderPlantas() {
+      const container = document.getElementById('plantas-container');
+      let plantasToShow = currentView === 'pendientes'
+        ? plantasData.filter(p => p.pending)
+        : plantasData;
+
+      container.innerHTML = plantasToShow.map(planta => {
+        const assignedCount = planta.assigned.length;
+        const isFull = assignedCount >= planta.capacity;
+        const isEmpty = assignedCount === 0;
+
+        const statusColor = isFull ? 'green' : isEmpty ? 'red' : 'amber';
+        const statusText = isFull ? 'Completo' : isEmpty ? 'Sin cubrir' : 'Parcial';
+        const borderColor = isFull ? 'border-green-200 bg-green-50' : isEmpty ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50';
+
+        const assignedPersonal = planta.assigned.map(personId => {
+          const person = personalData.find(p => p.id === personId);
+          return person ? `
+            <div class="assigned-staff card p-3 mb-2 flex items-center gap-3">
+              <img class="w-10 h-10 rounded-full" src="${person.avatar}" alt="${person.name}"/>
+              <div class="flex-1">
+                <h4 class="font-semibold text-sm">${person.name}</h4>
+                <p class="text-xs text-gray-600">${person.role}</p>
+              </div>
+              <button onclick="removeFromPlanta('${planta.id}', ${person.id})" class="text-red-500 hover:text-red-700 transition-colors">
+                <span class="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+          ` : '';
+        }).join('');
+
+        return `
+          <div class="border-2 ${borderColor} rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="font-bold text-gray-900">${planta.name}</h3>
+                <p class="text-sm text-gray-600">Capacidad: ${assignedCount}/${planta.capacity}</p>
+              </div>
+              <span class="px-3 py-1 bg-${statusColor}-100 text-${statusColor}-700 rounded-full text-xs font-semibold">${statusText}</span>
+            </div>
+            <div id="${planta.id}"
+                 class="drop-zone bg-white"
+                 data-planta="${planta.name}"
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)"
+                 ondrop="handleDrop(event, '${planta.id}')">
+              ${assignedPersonal}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const pendientesCount = plantasData.filter(p => p.pending).length;
+      document.getElementById('count-pendientes').textContent = `${pendientesCount} pendientes`;
+      document.getElementById('count-plantas').textContent = `${plantasData.length} plantas`;
+    }
+
+    function handleDragStart(event, personId) {
+      draggedElement = personId;
+      event.target.classList.add('dragging');
+    }
+
+    function handleDragEnd(event) {
+      event.target.classList.remove('dragging');
+      draggedElement = null;
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeave(event) {
+      event.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(event, plantaId) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('drag-over');
+
+      if (!draggedElement) return;
+
+      const planta = plantasData.find(p => p.id === plantaId);
+      if (!planta) return;
+
+      // Verificar capacidad
+      if (planta.assigned.length >= planta.capacity) {
+        alert(`⚠️ La planta ${planta.name} ya está completa (${planta.capacity}/${planta.capacity})`);
+        return;
+      }
+
+      // Agregar persona a la planta
+      if (!planta.assigned.includes(draggedElement)) {
+        planta.assigned.push(draggedElement);
+        planta.pending = planta.assigned.length < planta.capacity;
+
+        // Notificación visual
+        showNotification(`✅ ${personalData.find(p => p.id === draggedElement).name} asignado/a a ${planta.name}`);
+
+        // Actualizar vistas
+        renderPersonal();
+        renderPlantas();
+        updateStats();
+      }
+    }
+
+    function removeFromPlanta(plantaId, personId) {
+      const planta = plantasData.find(p => p.id === plantaId);
+      if (!planta) return;
+
+      planta.assigned = planta.assigned.filter(id => id !== personId);
+      planta.pending = planta.assigned.length < planta.capacity;
+
+      const person = personalData.find(p => p.id === personId);
+      showNotification(`🔄 ${person.name} removido/a de ${planta.name}`);
+
+      renderPersonal();
+      renderPlantas();
+      updateStats();
+    }
+
+    function toggleView(view) {
+      currentView = view;
+
+      // Actualizar botones
+      const btnPendientes = document.getElementById('btn-pendientes');
+      const btnTodas = document.getElementById('btn-todas');
+
+      if (view === 'pendientes') {
+        btnPendientes.className = 'px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-brand-primary text-white';
+        btnTodas.className = 'px-4 py-2 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-gray-200';
+      } else {
+        btnPendientes.className = 'px-4 py-2 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-gray-200';
+        btnTodas.className = 'px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-brand-primary text-white';
+      }
+
+      renderPlantas();
+    }
+
+    function filterPersonal() {
+      const search = document.getElementById('search-personal').value.toLowerCase();
+      const items = document.querySelectorAll('#personal-disponible .draggable-item');
+
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(search) ? 'flex' : 'none';
+      });
+    }
+
+    function updateStats() {
+      const available = getAvailablePersonal().length;
+      const assigned = personalData.length - available;
+      const completas = plantasData.filter(p => p.assigned.length >= p.capacity).length;
+      const pendientes = plantasData.filter(p => p.pending).length;
+
+      document.getElementById('stat-asignado').textContent = assigned;
+      document.getElementById('stat-disponible').textContent = available;
+      document.getElementById('stat-completas').textContent = completas;
+      document.getElementById('stat-pendientes').textContent = pendientes;
+    }
+
+    function showNotification(message) {
+      // Crear notificación temporal
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-pulse';
+      notification.textContent = message;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+
+    function addNewPlanta() {
+      const plantaName = prompt('Nombre de la nueva planta:');
+      if (!plantaName) return;
+
+      const capacity = parseInt(prompt('Capacidad (número de personas):')) || 2;
+
+      const newId = 'planta-' + (plantasData.length + 1);
+      plantasData.push({
+        id: newId,
+        name: plantaName,
+        capacity: capacity,
+        assigned: [],
+        pending: true
       });
 
-      draggable.addEventListener('dragend', () => {
-        draggable.classList.remove('opacity-50');
-      });
-    });
+      renderPlantas();
+      updateStats();
+      showNotification(`✅ Planta "${plantaName}" creada`);
+    }
 
-    dropZones.forEach(zone => {
-      zone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        zone.classList.add('drag-over');
-      });
-
-      zone.addEventListener('dragleave', () => {
-        zone.classList.remove('drag-over');
-      });
-
-      zone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        zone.classList.remove('drag-over');
-        
-        const draggedItem = document.querySelector('.opacity-50');
-        if (draggedItem) {
-          const clone = draggedItem.cloneNode(true);
-          zone.appendChild(clone);
-          draggedItem.remove();
-        }
-      });
-    });
+    // Inicializar
+    init();
   </script>
 
   <div class="h-16 lg:hidden"></div>
