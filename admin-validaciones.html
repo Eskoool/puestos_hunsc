@@ -217,14 +217,14 @@
     ];
 
     const plantasData = [
-      { id: 'planta-3', name: 'Planta 3 - Cardiología', capacity: 2, assigned: [], pending: true },
-      { id: 'planta-4', name: 'Planta 4 - Neurología', capacity: 2, assigned: [], pending: true },
-      { id: 'planta-5', name: 'Planta 5 - Oncología', capacity: 2, assigned: [5], pending: true },
-      { id: 'planta-6', name: 'Planta 6 - Traumatología', capacity: 3, assigned: [], pending: true },
-      { id: 'planta-7', name: 'Planta 7 - UCI', capacity: 2, assigned: [6, 7], pending: false },
-      { id: 'planta-8', name: 'Planta 8 - Medicina Interna', capacity: 3, assigned: [8, 9, 10], pending: false },
-      { id: 'planta-9', name: 'Planta 9 - Cirugía', capacity: 2, assigned: [11, 12], pending: false },
-      { id: 'planta-10', name: 'Planta 10 - Pediatría', capacity: 2, assigned: [], pending: true }
+      { id: 'planta-3', name: 'Planta 3 - Cardiología', capacity: 2, assigned: [] },
+      { id: 'planta-4', name: 'Planta 4 - Neurología', capacity: 2, assigned: [] },
+      { id: 'planta-5', name: 'Planta 5 - Oncología', capacity: 2, assigned: [5] },
+      { id: 'planta-6', name: 'Planta 6 - Traumatología', capacity: 3, assigned: [] },
+      { id: 'planta-7', name: 'Planta 7 - UCI', capacity: 2, assigned: [6, 7] },
+      { id: 'planta-8', name: 'Planta 8 - Medicina Interna', capacity: 3, assigned: [8, 9, 10] },
+      { id: 'planta-9', name: 'Planta 9 - Cirugía', capacity: 2, assigned: [11, 12] },
+      { id: 'planta-10', name: 'Planta 10 - Pediatría', capacity: 2, assigned: [] }
     ];
 
     let currentView = 'pendientes';
@@ -268,8 +268,9 @@
 
     function renderPlantas() {
       const container = document.getElementById('plantas-container');
+      // Una planta es "pendiente" solo si NO tiene nadie asignado
       let plantasToShow = currentView === 'pendientes'
-        ? plantasData.filter(p => p.pending)
+        ? plantasData.filter(p => p.assigned.length === 0)
         : plantasData;
 
       container.innerHTML = plantasToShow.map(planta => {
@@ -318,7 +319,8 @@
         `;
       }).join('');
 
-      const pendientesCount = plantasData.filter(p => p.pending).length;
+      // Contar plantas sin nadie asignado
+      const pendientesCount = plantasData.filter(p => p.assigned.length === 0).length;
       document.getElementById('count-pendientes').textContent = `${pendientesCount} pendientes`;
       document.getElementById('count-plantas').textContent = `${plantasData.length} plantas`;
     }
@@ -360,7 +362,6 @@
       // Agregar persona a la planta
       if (!planta.assigned.includes(draggedElement)) {
         planta.assigned.push(draggedElement);
-        planta.pending = planta.assigned.length < planta.capacity;
 
         // Notificación visual
         showNotification(`✅ ${personalData.find(p => p.id === draggedElement).name} asignado/a a ${planta.name}`);
@@ -377,7 +378,6 @@
       if (!planta) return;
 
       planta.assigned = planta.assigned.filter(id => id !== personId);
-      planta.pending = planta.assigned.length < planta.capacity;
 
       const person = personalData.find(p => p.id === personId);
       showNotification(`🔄 ${person.name} removido/a de ${planta.name}`);
@@ -419,7 +419,7 @@
       const available = getAvailablePersonal().length;
       const assigned = personalData.length - available;
       const completas = plantasData.filter(p => p.assigned.length >= p.capacity).length;
-      const pendientes = plantasData.filter(p => p.pending).length;
+      const pendientes = plantasData.filter(p => p.assigned.length === 0).length;
 
       document.getElementById('stat-asignado').textContent = assigned;
       document.getElementById('stat-disponible').textContent = available;
@@ -450,8 +450,7 @@
         id: newId,
         name: plantaName,
         capacity: capacity,
-        assigned: [],
-        pending: true
+        assigned: []
       });
 
       renderPlantas();
