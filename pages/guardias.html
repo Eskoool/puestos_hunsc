@@ -307,22 +307,31 @@
       </div>
 
       <form id="swapForm" class="space-y-4">
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <p class="text-xs text-amber-700">
+            <strong>⚠️ Importante:</strong> Solo se pueden intercambiar guardias entre personas del mismo rol (FIR ↔ FIR o Farmacéutico ↔ Farmacéutico)
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Rol del Cambio</label>
+          <select id="swapRole" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+            <option value="">Seleccionar rol...</option>
+            <option value="FIR">🎓 FIR (Farmacéutico Interno Residente)</option>
+            <option value="Farmacéutico">💊 Farmacéutico/Administrador</option>
+          </select>
+        </div>
+
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">Usuario 1</label>
-          <select id="user1" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
-            <option value="">Seleccionar...</option>
-            <option value="maria">María Sanz (Yo)</option>
-            <option value="ana">Ana Pérez García</option>
-            <option value="juan">Juan Rodríguez</option>
-            <option value="pedro">Pedro Martín</option>
-            <option value="laura">Laura Gómez</option>
-            <option value="carlos">Carlos Vega</option>
+          <select id="user1" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary" disabled>
+            <option value="">Primero selecciona un rol...</option>
           </select>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">Guardia de Usuario 1</label>
-          <select id="shift1" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+          <select id="shift1" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary" disabled>
             <option value="">Seleccionar guardia...</option>
           </select>
         </div>
@@ -333,20 +342,14 @@
 
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">Usuario 2</label>
-          <select id="user2" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
-            <option value="">Seleccionar...</option>
-            <option value="maria">María Sanz (Yo)</option>
-            <option value="ana">Ana Pérez García</option>
-            <option value="juan">Juan Rodríguez</option>
-            <option value="pedro">Pedro Martín</option>
-            <option value="laura">Laura Gómez</option>
-            <option value="carlos">Carlos Vega</option>
+          <select id="user2" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary" disabled>
+            <option value="">Primero selecciona un rol...</option>
           </select>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-2">Guardia de Usuario 2</label>
-          <select id="shift2" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+          <select id="shift2" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary" disabled>
             <option value="">Seleccionar guardia...</option>
           </select>
         </div>
@@ -370,30 +373,86 @@
 
   <script>
     const currentUser = 'María Sanz';
+    const currentUserRole = 'FIR'; // FIR o Farmacéutico
     let currentMonth = 11; // Diciembre (0-indexed)
     let currentYear = 2024;
 
-    // Datos de guardias (simulados)
+    // Datos de usuarios con roles
+    const users = {
+      'María Sanz': { role: 'FIR', fullName: 'María Sanz (FIR)' },
+      'Juan Rodríguez': { role: 'FIR', fullName: 'Juan Rodríguez (FIR)' },
+      'Laura Gómez': { role: 'FIR', fullName: 'Laura Gómez (FIR)' },
+      'Ana Pérez': { role: 'Farmacéutico', fullName: 'Ana Pérez García (Farmacéutico)' },
+      'Pedro Martín': { role: 'Farmacéutico', fullName: 'Pedro Martín (Farmacéutico)' },
+      'Carlos Vega': { role: 'Farmacéutico', fullName: 'Carlos Vega (Farmacéutico)' }
+    };
+
+    // Datos de guardias (simulados) - Cada guardia tiene FIR + Farmacéutico
     const shifts = {
-      '2024-12-02': [{ user: 'María Sanz', type: 'manana', hours: '08:00-15:00' }],
-      '2024-12-03': [{ user: 'Pedro Martín', type: 'noche', hours: '22:00-08:00' }],
-      '2024-12-04': [{ user: 'Laura Gómez', type: 'manana', hours: '08:00-15:00' }],
-      '2024-12-05': [{ user: 'Carlos Vega', type: 'tarde', hours: '15:00-22:00' }],
-      '2024-12-07': [{ user: 'María Sanz', type: '24h', hours: '00:00-23:59' }],
-      '2024-12-09': [
-        { user: 'Ana Pérez', type: 'manana', hours: '08:00-15:00' },
-        { user: 'Juan Rodríguez', type: 'noche', hours: '22:00-08:00' }
+      '2024-12-02': [
+        { user: 'María Sanz', role: 'FIR', type: 'manana', hours: '08:00-15:00' },
+        { user: 'Ana Pérez', role: 'Farmacéutico', type: 'manana', hours: '08:00-15:00' }
       ],
-      '2024-12-12': [{ user: 'Carlos Vega', type: 'tarde', hours: '15:00-22:00' }],
-      '2024-12-14': [{ user: 'María Sanz', type: '24h', hours: '00:00-23:59' }],
-      '2024-12-16': [{ user: 'Ana Pérez', type: 'manana', hours: '08:00-15:00' }],
-      '2024-12-18': [{ user: 'Pedro Martín', type: 'noche', hours: '22:00-08:00' }],
-      '2024-12-19': [{ user: 'Laura Gómez', type: 'manana', hours: '08:00-15:00' }],
-      '2024-12-21': [{ user: 'María Sanz', type: '24h', hours: '00:00-23:59' }],
-      '2024-12-23': [{ user: 'Ana Pérez', type: 'manana', hours: '08:00-15:00' }],
-      '2024-12-25': [{ user: 'Juan Rodríguez', type: 'noche', hours: '22:00-08:00' }],
-      '2024-12-28': [{ user: 'Carlos Vega', type: '24h', hours: '00:00-23:59' }],
-      '2024-12-30': [{ user: 'Laura Gómez', type: 'tarde', hours: '15:00-22:00' }]
+      '2024-12-03': [
+        { user: 'Juan Rodríguez', role: 'FIR', type: 'noche', hours: '22:00-08:00' },
+        { user: 'Pedro Martín', role: 'Farmacéutico', type: 'noche', hours: '22:00-08:00' }
+      ],
+      '2024-12-04': [
+        { user: 'Laura Gómez', role: 'FIR', type: 'manana', hours: '08:00-15:00' },
+        { user: 'Carlos Vega', role: 'Farmacéutico', type: 'manana', hours: '08:00-15:00' }
+      ],
+      '2024-12-05': [
+        { user: 'María Sanz', role: 'FIR', type: 'tarde', hours: '15:00-22:00' },
+        { user: 'Ana Pérez', role: 'Farmacéutico', type: 'tarde', hours: '15:00-22:00' }
+      ],
+      '2024-12-07': [
+        { user: 'Juan Rodríguez', role: 'FIR', type: '24h', hours: '00:00-23:59' },
+        { user: 'Pedro Martín', role: 'Farmacéutico', type: '24h', hours: '00:00-23:59' }
+      ],
+      '2024-12-09': [
+        { user: 'María Sanz', role: 'FIR', type: 'manana', hours: '08:00-15:00' },
+        { user: 'Carlos Vega', role: 'Farmacéutico', type: 'manana', hours: '08:00-15:00' }
+      ],
+      '2024-12-12': [
+        { user: 'Laura Gómez', role: 'FIR', type: 'tarde', hours: '15:00-22:00' },
+        { user: 'Ana Pérez', role: 'Farmacéutico', type: 'tarde', hours: '15:00-22:00' }
+      ],
+      '2024-12-14': [
+        { user: 'María Sanz', role: 'FIR', type: '24h', hours: '00:00-23:59' },
+        { user: 'Pedro Martín', role: 'Farmacéutico', type: '24h', hours: '00:00-23:59' }
+      ],
+      '2024-12-16': [
+        { user: 'Juan Rodríguez', role: 'FIR', type: 'manana', hours: '08:00-15:00' },
+        { user: 'Carlos Vega', role: 'Farmacéutico', type: 'manana', hours: '08:00-15:00' }
+      ],
+      '2024-12-18': [
+        { user: 'Laura Gómez', role: 'FIR', type: 'noche', hours: '22:00-08:00' },
+        { user: 'Ana Pérez', role: 'Farmacéutico', type: 'noche', hours: '22:00-08:00' }
+      ],
+      '2024-12-19': [
+        { user: 'María Sanz', role: 'FIR', type: 'manana', hours: '08:00-15:00' },
+        { user: 'Pedro Martín', role: 'Farmacéutico', type: 'manana', hours: '08:00-15:00' }
+      ],
+      '2024-12-21': [
+        { user: 'Juan Rodríguez', role: 'FIR', type: '24h', hours: '00:00-23:59' },
+        { user: 'Carlos Vega', role: 'Farmacéutico', type: '24h', hours: '00:00-23:59' }
+      ],
+      '2024-12-23': [
+        { user: 'Laura Gómez', role: 'FIR', type: 'manana', hours: '08:00-15:00' },
+        { user: 'Ana Pérez', role: 'Farmacéutico', type: 'manana', hours: '08:00-15:00' }
+      ],
+      '2024-12-25': [
+        { user: 'María Sanz', role: 'FIR', type: 'noche', hours: '22:00-08:00' },
+        { user: 'Pedro Martín', role: 'Farmacéutico', type: 'noche', hours: '22:00-08:00' }
+      ],
+      '2024-12-28': [
+        { user: 'Juan Rodríguez', role: 'FIR', type: '24h', hours: '00:00-23:59' },
+        { user: 'Carlos Vega', role: 'Farmacéutico', type: '24h', hours: '00:00-23:59' }
+      ],
+      '2024-12-30': [
+        { user: 'Laura Gómez', role: 'FIR', type: 'tarde', hours: '15:00-22:00' },
+        { user: 'Ana Pérez', role: 'Farmacéutico', type: 'tarde', hours: '15:00-22:00' }
+      ]
     };
 
     function renderCalendar() {
@@ -436,7 +495,9 @@
           const isMine = shift.user === currentUser;
           const badgeClass = isMine ? 'shift-badge my-shift' : `shift-badge shift-${shift.type}`;
           const starIcon = isMine ? '<span class="material-symbols-outlined" style="font-size: 10px;">star</span>' : '';
-          html += `<div class="${badgeClass}" onclick='showShiftDetails(${JSON.stringify(shift)}, "${dateStr}")'>${starIcon}<span>${shift.user}</span></div>`;
+          const roleIcon = shift.role === 'FIR' ? '🎓' : '💊';
+          const displayName = shift.user.split(' ')[0]; // Solo el nombre
+          html += `<div class="${badgeClass}" onclick='showShiftDetails(${JSON.stringify(shift)}, "${dateStr}")' title="${shift.user} (${shift.role})">${starIcon}${roleIcon} <span>${displayName}</span></div>`;
         });
 
         html += '</div>';
@@ -461,7 +522,6 @@
       const modal = document.getElementById('detailsModal');
       const content = document.getElementById('detailsContent');
 
-      const isMine = shift.user === currentUser;
       const dateObj = new Date(date);
       const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -472,14 +532,13 @@
         '24h': 'Guardia de 24 Horas'
       };
 
+      // Obtener ambas personas de la guardia
+      const allShifts = shifts[date] || [];
+      const firStaff = allShifts.find(s => s.role === 'FIR');
+      const pharmacistStaff = allShifts.find(s => s.role === 'Farmacéutico');
+
       content.innerHTML = `
         <div class="space-y-4">
-          <div class="p-4 bg-gray-50 rounded-xl">
-            <p class="text-sm text-gray-600">Personal Asignado</p>
-            <p class="text-xl font-bold text-gray-900">${shift.user}</p>
-            ${isMine ? '<span class="inline-block mt-1 px-2 py-1 bg-primary text-white text-xs rounded-full font-semibold">Mi Guardia</span>' : ''}
-          </div>
-
           <div class="p-4 bg-gray-50 rounded-xl">
             <p class="text-sm text-gray-600">Tipo de Guardia</p>
             <p class="text-lg font-semibold text-gray-900">${typeNames[shift.type]}</p>
@@ -493,6 +552,24 @@
           <div class="p-4 bg-gray-50 rounded-xl">
             <p class="text-sm text-gray-600">Horario</p>
             <p class="text-lg font-semibold text-gray-900">${shift.hours}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            ${firStaff ? `
+              <div class="p-4 bg-blue-50 rounded-xl border-2 ${firStaff.user === currentUser ? 'border-primary' : 'border-blue-200'}">
+                <p class="text-xs text-blue-600 font-semibold mb-1">🎓 FIR</p>
+                <p class="text-base font-bold text-gray-900">${firStaff.user}</p>
+                ${firStaff.user === currentUser ? '<span class="inline-block mt-1 px-2 py-1 bg-primary text-white text-xs rounded-full font-semibold">Mi Guardia</span>' : ''}
+              </div>
+            ` : '<div class="p-4 bg-gray-50 rounded-xl"><p class="text-xs text-gray-400">Sin FIR asignado</p></div>'}
+
+            ${pharmacistStaff ? `
+              <div class="p-4 bg-purple-50 rounded-xl border-2 ${pharmacistStaff.user === currentUser ? 'border-primary' : 'border-purple-200'}">
+                <p class="text-xs text-purple-600 font-semibold mb-1">💊 Farmacéutico</p>
+                <p class="text-base font-bold text-gray-900">${pharmacistStaff.user}</p>
+                ${pharmacistStaff.user === currentUser ? '<span class="inline-block mt-1 px-2 py-1 bg-primary text-white text-xs rounded-full font-semibold">Mi Guardia</span>' : ''}
+              </div>
+            ` : '<div class="p-4 bg-gray-50 rounded-xl"><p class="text-xs text-gray-400">Sin Farmacéutico asignado</p></div>'}
           </div>
         </div>
       `;
@@ -512,31 +589,57 @@
       document.getElementById('swapModal').classList.remove('active');
     }
 
+    // Handle role selection to enable user selects
+    document.getElementById('swapRole').addEventListener('change', function() {
+      const role = this.value;
+      const user1Select = document.getElementById('user1');
+      const user2Select = document.getElementById('user2');
+
+      if (!role) {
+        user1Select.disabled = true;
+        user2Select.disabled = true;
+        user1Select.innerHTML = '<option value="">Primero selecciona un rol...</option>';
+        user2Select.innerHTML = '<option value="">Primero selecciona un rol...</option>';
+        return;
+      }
+
+      // Enable selects and populate with users of selected role
+      user1Select.disabled = false;
+      user2Select.disabled = false;
+
+      const roleUsers = Object.entries(users).filter(([name, data]) => data.role === role);
+
+      user1Select.innerHTML = '<option value="">Seleccionar...</option>';
+      user2Select.innerHTML = '<option value="">Seleccionar...</option>';
+
+      roleUsers.forEach(([name, data]) => {
+        const option1 = document.createElement('option');
+        const option2 = document.createElement('option');
+        option1.value = name;
+        option1.textContent = data.fullName + (name === currentUser ? ' (Yo)' : '');
+        option2.value = name;
+        option2.textContent = data.fullName + (name === currentUser ? ' (Yo)' : '');
+        user1Select.appendChild(option1);
+        user2Select.appendChild(option2);
+      });
+    });
+
     // Handle user selection to load their shifts
     document.getElementById('user1').addEventListener('change', function() {
       loadUserShifts('shift1', this.value);
+      document.getElementById('shift1').disabled = false;
     });
 
     document.getElementById('user2').addEventListener('change', function() {
       loadUserShifts('shift2', this.value);
+      document.getElementById('shift2').disabled = false;
     });
 
-    function loadUserShifts(selectId, userId) {
+    function loadUserShifts(selectId, userName) {
       const select = document.getElementById(selectId);
       select.innerHTML = '<option value="">Seleccionar guardia...</option>';
 
-      if (!userId) return;
-
-      const userNames = {
-        'maria': 'María Sanz',
-        'ana': 'Ana Pérez García',
-        'juan': 'Juan Rodríguez',
-        'pedro': 'Pedro Martín',
-        'laura': 'Laura Gómez',
-        'carlos': 'Carlos Vega'
-      };
-
-      const userName = userNames[userId];
+      if (!userName) return;
 
       Object.entries(shifts).forEach(([date, dayShifts]) => {
         dayShifts.forEach(shift => {
@@ -548,7 +651,7 @@
               '24h': '24 Horas'
             };
             const option = document.createElement('option');
-            option.value = date + '-' + shift.type;
+            option.value = date + '-' + shift.type + '-' + shift.role;
             option.textContent = `${date} - ${typeNames[shift.type]} (${shift.hours})`;
             select.appendChild(option);
           }
@@ -559,21 +662,43 @@
     document.getElementById('swapForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
+      const role = document.getElementById('swapRole').value;
       const user1 = document.getElementById('user1').value;
       const user2 = document.getElementById('user2').value;
       const shift1 = document.getElementById('shift1').value;
       const shift2 = document.getElementById('shift2').value;
       const reason = document.getElementById('swapReason').value;
 
-      if (!user1 || !user2 || !shift1 || !shift2 || !reason) {
+      if (!role || !user1 || !user2 || !shift1 || !shift2 || !reason) {
         alert('Por favor completa todos los campos');
         return;
       }
 
-      alert(`Cambio registrado con éxito:\n\n${document.getElementById('user1').options[document.getElementById('user1').selectedIndex].text} → ${document.getElementById('shift2').options[document.getElementById('shift2').selectedIndex].text}\n\n${document.getElementById('user2').options[document.getElementById('user2').selectedIndex].text} → ${document.getElementById('shift1').options[document.getElementById('shift1').selectedIndex].text}\n\nMotivo: ${reason}`);
+      // Validar que los usuarios sean diferentes
+      if (user1 === user2) {
+        alert('No puedes intercambiar guardias del mismo usuario');
+        return;
+      }
+
+      // Validar que ambos usuarios tengan el mismo rol (doble verificación)
+      const user1Role = users[user1].role;
+      const user2Role = users[user2].role;
+
+      if (user1Role !== user2Role) {
+        alert(`❌ Error: No se puede intercambiar guardias entre diferentes roles.\n\n${user1} es ${user1Role}\n${user2} es ${user2Role}\n\nSolo se permiten cambios entre el mismo rol.`);
+        return;
+      }
+
+      const roleIcon = role === 'FIR' ? '🎓' : '💊';
+      alert(`✅ Cambio de guardia registrado con éxito!\n\n${roleIcon} Rol: ${role}\n\n${document.getElementById('user1').options[document.getElementById('user1').selectedIndex].text}\n  ↓\n${document.getElementById('shift2').options[document.getElementById('shift2').selectedIndex].text}\n\n${document.getElementById('user2').options[document.getElementById('user2').selectedIndex].text}\n  ↓\n${document.getElementById('shift1').options[document.getElementById('shift1').selectedIndex].text}\n\nMotivo: ${reason}`);
 
       closeSwapModal();
       document.getElementById('swapForm').reset();
+      // Reset disabled states
+      document.getElementById('user1').disabled = true;
+      document.getElementById('user2').disabled = true;
+      document.getElementById('shift1').disabled = true;
+      document.getElementById('shift2').disabled = true;
     });
 
     // Initialize
