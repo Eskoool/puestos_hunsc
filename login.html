@@ -110,11 +110,94 @@
       const errorMessageDiv = document.getElementById('error-message');
 
       try {
-        // PASO 1: Verificar si viene token en la URL (redirect desde Lovable)
+        // PASO 1: Verificar si viene SSO token en la URL (redirect desde Lovable)
         const urlParams = new URLSearchParams(window.location.search);
+        const ssoToken = urlParams.get('sso_token');
         const accessToken = urlParams.get('access_token');
         const refreshToken = urlParams.get('refresh_token');
 
+        // OPCIÓN A: SSO Token de Lovable (NUEVO - RECOMENDADO)
+        if (ssoToken) {
+          console.log('✅ SSO Token recibido desde Lovable, procesando...');
+
+          try {
+            // Decodificar el token SSO (base64)
+            const decoded = JSON.parse(atob(ssoToken));
+
+            // Verificar expiración (5 minutos)
+            if (decoded.exp <= Date.now() / 1000) {
+              throw new Error('Token SSO expirado. Por favor, vuelve a iniciar sesión.');
+            }
+
+            console.log('✅ Token SSO válido:', decoded);
+
+            // Crear/actualizar usuario en Supabase tabla 'users'
+            const { data: userData, error: upsertError } = await supabaseClient
+              .from('users')
+              .upsert({
+                email: decoded.email,
+                nombre: `${decoded.name} ${decoded.surname}`.trim(),
+                rol: decoded.role,
+                hospital: decoded.hospital,
+                updated_at: new Date().toISOString()
+              }, {
+                onConflict: 'email'
+              })
+              .select()
+              .single();
+
+            if (upsertError) {
+              console.error('Error actualizando usuario:', upsertError);
+              throw new Error('Error sincronizando usuario con la base de datos');
+            }
+
+            console.log('✅ Usuario sincronizado en Supabase:', userData);
+
+            // Crear sesión de Supabase usando magic link
+            // (Necesitamos crear una sesión válida para que funcione el resto de la app)
+            const { data: linkData, error: linkError } = await supabaseClient.auth.signInWithOtp({
+              email: decoded.email,
+              options: {
+                shouldCreateUser: true
+              }
+            });
+
+            if (linkError) {
+              console.error('Error creando sesión:', linkError);
+              // Continuar de todas formas, guardaremos en sessionStorage
+            }
+
+            // Guardar datos del usuario en sessionStorage
+            sessionStorage.setItem('sso_user', JSON.stringify({
+              id: userData.id,
+              email: decoded.email,
+              nombre: `${decoded.name} ${decoded.surname}`.trim(),
+              rol: decoded.role,
+              hospital: decoded.hospital,
+              exp: decoded.exp
+            }));
+
+            // Limpiar URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            // Redirigir según rol
+            const rol = (decoded.role || '').toLowerCase();
+            if (rol === 'administrador' || rol === 'admin' || rol === 'administrator') {
+              console.log('Redirigiendo a admin-dashboard.html');
+              window.location.href = 'admin-dashboard.html';
+            } else {
+              console.log('Redirigiendo a index.html');
+              window.location.href = 'index.html';
+            }
+            return;
+
+          } catch (decodeError) {
+            console.error('Error procesando SSO token:', decodeError);
+            throw new Error('Token SSO inválido: ' + decodeError.message);
+          }
+        }
+
+        // OPCIÓN B: Access/Refresh Tokens (FALLBACK)
         if (accessToken && refreshToken) {
           console.log('✅ Token recibido desde Lovable, estableciendo sesión...');
 

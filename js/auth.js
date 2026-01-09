@@ -13,7 +13,39 @@ let userRole = null;
  */
 async function initAuth() {
   try {
-    // Obtener sesión actual de Supabase
+    // PRIORIDAD 1: Verificar SSO en sessionStorage (desde Lovable)
+    const ssoUser = sessionStorage.getItem('sso_user');
+
+    if (ssoUser) {
+      try {
+        const parsed = JSON.parse(ssoUser);
+
+        // Verificar expiración
+        if (parsed.exp && parsed.exp > Date.now() / 1000) {
+          console.log('✅ Usuario SSO encontrado en sessionStorage:', parsed.email);
+
+          currentUser = {
+            id: parsed.id,
+            email: parsed.email,
+            nombre: parsed.nombre,
+            rol: parsed.rol,
+            hospital: parsed.hospital
+          };
+          userRole = parsed.rol;
+
+          console.log('✅ Usuario autenticado via SSO:', currentUser.email, '- Rol:', userRole);
+          return currentUser;
+        } else {
+          console.log('Token SSO expirado, limpiando...');
+          sessionStorage.removeItem('sso_user');
+        }
+      } catch (parseError) {
+        console.error('Error parseando SSO user:', parseError);
+        sessionStorage.removeItem('sso_user');
+      }
+    }
+
+    // PRIORIDAD 2: Sesión de Supabase tradicional
     const { data: { session }, error } = await supabaseClient.auth.getSession();
 
     if (error) {
@@ -167,10 +199,13 @@ async function requireAuth() {
  */
 async function logout() {
   try {
+    // Limpiar sessionStorage de SSO
+    sessionStorage.removeItem('sso_user');
+
+    // Cerrar sesión de Supabase (si existe)
     const { error } = await supabaseClient.auth.signOut();
     if (error) {
       console.error('Error al cerrar sesión:', error);
-      return;
     }
 
     currentUser = null;
