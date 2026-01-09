@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Supabase - Users</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .success {
+      color: #10B981;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .error {
+      color: #EF4444;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .loading {
+      color: #6366F1;
+      font-size: 18px;
+    }
+    pre {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    h1 {
+      color: #5A0E6E;
+    }
+    .info {
+      background: #EFF6FF;
+      border-left: 4px solid #3B82F6;
+      padding: 12px;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔌 Test de Conexión Supabase</h1>
+
+  <div class="card">
+    <h2>Estado de Conexión</h2>
+    <div id="status" class="loading">⏳ Conectando...</div>
+  </div>
+
+  <div class="card">
+    <h2>Resultado</h2>
+    <div id="result"></div>
+  </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = 'https://julrvkllcifpcdyvbikr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1bHJ2a2xsY2lmcGNkeXZiaWtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyNTk4NjUsImV4cCI6MjA2MjgzNTg2NX0.6EIGwcVca6dahNWJ3qniLGnhr2BOmqDLRr3y9C92GME';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function testConnection() {
+      const statusDiv = document.getElementById('status');
+      const resultDiv = document.getElementById('result');
+
+      let output = '';
+
+      try {
+        // Test 1: Intentar con tabla "users"
+        output += '📊 Test 1: Probando tabla "users"...\n\n';
+
+        const { data: usersData, error: usersError, count: usersCount } = await supabase
+          .from('users')
+          .select('*', { count: 'exact' })
+          .limit(5);
+
+        if (usersError) {
+          output += `❌ Error en tabla "users": ${usersError.message}\n`;
+          output += `   Código: ${usersError.code}\n`;
+          output += `   Detalles: ${usersError.details}\n\n`;
+
+          // Test 2: Intentar con tabla "usuarios"
+          output += '🔄 Test 2: Probando tabla "usuarios"...\n\n';
+
+          const { data: usuariosData, error: usuariosError, count: usuariosCount } = await supabase
+            .from('usuarios')
+            .select('*', { count: 'exact' })
+            .limit(5);
+
+          if (usuariosError) {
+            output += `❌ Error en tabla "usuarios": ${usuariosError.message}\n`;
+            output += `   Código: ${usuariosError.code}\n\n`;
+
+            // Test 3: Listar todas las tablas disponibles
+            output += '🔍 Test 3: Intentando detectar tablas disponibles...\n\n';
+
+            const tablesToTry = [
+              'users', 'usuarios', 'personal', 'staff',
+              'areas', 'departamentos',
+              'puestos', 'positions',
+              'asignaciones', 'assignments',
+              'guardias', 'shifts', 'turnos'
+            ];
+
+            let foundTables = [];
+
+            for (const table of tablesToTry) {
+              const { data, error } = await supabase
+                .from(table)
+                .select('*')
+                .limit(1);
+
+              if (!error) {
+                const { count } = await supabase
+                  .from(table)
+                  .select('*', { count: 'exact', head: true });
+
+                foundTables.push({ name: table, count: count || 0 });
+              }
+            }
+
+            if (foundTables.length > 0) {
+              output += `✅ Tablas encontradas:\n\n`;
+              foundTables.forEach(t => {
+                output += `   📊 ${t.name}: ${t.count} registros\n`;
+              });
+
+              statusDiv.className = 'success';
+              statusDiv.textContent = '✅ Conexión exitosa - Tablas encontradas';
+
+              // Mostrar datos de la primera tabla
+              const firstTable = foundTables[0].name;
+              output += `\n📋 Datos de ejemplo de "${firstTable}":\n\n`;
+
+              const { data: sampleData } = await supabase
+                .from(firstTable)
+                .select('*')
+                .limit(3);
+
+              if (sampleData && sampleData.length > 0) {
+                output += `Columnas: ${Object.keys(sampleData[0]).join(', ')}\n\n`;
+                output += JSON.stringify(sampleData, null, 2);
+              }
+
+            } else {
+              statusDiv.className = 'error';
+              statusDiv.textContent = '❌ No se encontraron tablas conocidas';
+              output += '❌ No se pudo acceder a ninguna tabla.\n';
+              output += '\n💡 Revisa en Supabase Table Editor qué tablas tienes creadas.';
+            }
+
+          } else {
+            // Éxito con "usuarios"
+            statusDiv.className = 'success';
+            statusDiv.textContent = '✅ Conexión exitosa a tabla "usuarios"';
+
+            output += `✅ Tabla "usuarios" encontrada: ${usuariosCount} registros\n\n`;
+
+            if (usuariosData && usuariosData.length > 0) {
+              output += `📐 Columnas detectadas:\n`;
+              output += Object.keys(usuariosData[0]).join(', ') + '\n\n';
+
+              output += `👥 Primeros ${usuariosData.length} usuarios:\n\n`;
+              output += JSON.stringify(usuariosData, null, 2);
+            }
+          }
+
+        } else {
+          // Éxito con "users"
+          statusDiv.className = 'success';
+          statusDiv.textContent = '✅ Conexión exitosa a tabla "users"';
+
+          output += `✅ Tabla "users" encontrada: ${usersCount} registros\n\n`;
+
+          if (usersData && usersData.length > 0) {
+            output += `📐 Columnas detectadas:\n`;
+            output += Object.keys(usersData[0]).join(', ') + '\n\n';
+
+            output += `👥 Primeros ${usersData.length} usuarios:\n\n`;
+            output += JSON.stringify(usersData, null, 2);
+          }
+        }
+
+        resultDiv.innerHTML = `<pre>${output}</pre>`;
+
+      } catch (err) {
+        statusDiv.className = 'error';
+        statusDiv.textContent = '❌ Error de conexión';
+
+        output += `❌ Error general: ${err.message}\n`;
+        output += `\nStack trace:\n${err.stack}`;
+
+        resultDiv.innerHTML = `<pre>${output}</pre>`;
+      }
+    }
+
+    // Ejecutar al cargar
+    testConnection();
+  </script>
+</body>
+</html>
