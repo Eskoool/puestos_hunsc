@@ -31,24 +31,25 @@
       background: white;
       border-radius: 24px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
     }
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid white;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
     }
-    .role-card {
-      cursor: pointer;
-      border: 3px solid transparent;
-    }
-    .role-card:hover {
-      border-color: #5A0E6E;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 
 <body class="flex items-center justify-center p-4">
-  <div class="w-full max-w-6xl">
+  <div class="w-full max-w-2xl">
     <!-- Logo y Título -->
     <div class="text-center mb-12">
       <img class="h-24 mx-auto mb-6" src="https://lh3.googleusercontent.com/d/1S6INg4SoWOJsoccSDnmP92EKK3GwWeTY" alt="Logo HUNSC"/>
@@ -56,77 +57,113 @@
       <p class="text-xl text-white/80">Sistema de Gestión de Puestos y Guardias</p>
     </div>
 
-    <!-- Selección de Rol -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-      <!-- Usuario -->
-      <div class="role-card card p-8" onclick="window.location.href='index.html'">
-        <div class="text-center">
-          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white" style="font-size: 48px;">person</span>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">Usuario</h2>
-          <p class="text-gray-600 mb-6">Accede a tus guardias, vacaciones y asignaciones</p>
-          <div class="space-y-2 text-left mb-6">
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-blue-500">check_circle</span>
-              <span>Ver mi calendario de guardias</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-blue-500">check_circle</span>
-              <span>Solicitar vacaciones</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-blue-500">check_circle</span>
-              <span>Registrar cambios de guardia</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-blue-500">check_circle</span>
-              <span>Ver mis asignaciones</span>
-            </div>
-          </div>
-          <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity">
-            Acceder como Usuario
-          </button>
-        </div>
+    <!-- Estado de Autenticación -->
+    <div class="card p-8">
+      <div id="auth-status" class="text-center">
+        <div class="spinner mb-6"></div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-3">Verificando sesión...</h2>
+        <p class="text-gray-600">Conectando con Supabase</p>
       </div>
 
-      <!-- Administrador -->
-      <div class="role-card card p-8" onclick="window.location.href='admin-dashboard.html'">
-        <div class="text-center">
-          <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-brand-primary to-purple-700 flex items-center justify-center">
-            <span class="material-symbols-outlined text-white" style="font-size: 48px;">admin_panel_settings</span>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">Administrador</h2>
-          <p class="text-gray-600 mb-6">Control total del sistema de gestión</p>
-          <div class="space-y-2 text-left mb-6">
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-brand-primary">check_circle</span>
-              <span>Gestionar asignaciones de personal</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-brand-primary">check_circle</span>
-              <span>Aprobar/rechazar vacaciones</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-brand-primary">check_circle</span>
-              <span>Planificar guardias (FIR + Farmacéutico)</span>
-            </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <span class="material-symbols-outlined text-brand-primary">check_circle</span>
-              <span>Gestionar validaciones por plantas</span>
-            </div>
-          </div>
-          <button class="w-full py-3 bg-gradient-to-r from-brand-primary to-purple-700 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity">
-            Acceder como Administrador
-          </button>
+      <!-- Botón de Login (oculto inicialmente) -->
+      <div id="login-button" class="hidden text-center">
+        <div class="mb-6">
+          <span class="material-symbols-outlined text-brand-primary" style="font-size: 64px;">lock</span>
         </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-3">Acceso al Sistema</h2>
+        <p class="text-gray-600 mb-6">Inicia sesión desde la aplicación principal</p>
+        <a href="https://farma-frello-colabora.lovable.app" class="inline-block w-full py-4 bg-gradient-to-r from-brand-primary to-purple-700 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity">
+          Ir a Login Principal
+        </a>
+        <p class="text-sm text-gray-500 mt-4">Serás redirigido automáticamente después de iniciar sesión</p>
+      </div>
+
+      <!-- Error -->
+      <div id="auth-error" class="hidden text-center">
+        <div class="mb-6">
+          <span class="material-symbols-outlined text-red-500" style="font-size: 64px;">error</span>
+        </div>
+        <h2 class="text-2xl font-bold text-red-600 mb-3">Error de Autenticación</h2>
+        <p class="text-gray-600 mb-6" id="error-message"></p>
+        <a href="https://farma-frello-colabora.lovable.app" class="inline-block w-full py-4 bg-red-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity">
+          Volver a Login
+        </a>
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="text-center text-white/60 text-sm">
+    <div class="text-center text-white/60 text-sm mt-8">
       <p>Sistema de Gestión de Farmacia HUNSC Sur - Hospital Universitario Nuestra Señora de Candelaria</p>
     </div>
   </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    async function checkAuth() {
+      const authStatusDiv = document.getElementById('auth-status');
+      const loginButtonDiv = document.getElementById('login-button');
+      const authErrorDiv = document.getElementById('auth-error');
+      const errorMessageDiv = document.getElementById('error-message');
+
+      try {
+        // Verificar sesión de Supabase
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+        if (error) {
+          throw error;
+        }
+
+        if (!session) {
+          // No hay sesión activa
+          console.log('No hay sesión activa, mostrar botón de login');
+          authStatusDiv.classList.add('hidden');
+          loginButtonDiv.classList.remove('hidden');
+          return;
+        }
+
+        // Hay sesión, cargar datos del usuario
+        console.log('Sesión encontrada, cargando usuario...');
+
+        const { data: authUser } = await supabaseClient.auth.getUser();
+
+        // Buscar usuario en tabla users
+        const { data: userData, error: userError } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('email', authUser.user.email)
+          .single();
+
+        if (userError || !userData) {
+          throw new Error('Usuario no encontrado en la base de datos');
+        }
+
+        console.log('Usuario encontrado:', userData);
+
+        // Determinar rol y redirigir
+        const rol = (userData.rol || userData.role || '').toLowerCase();
+
+        if (rol === 'administrador' || rol === 'admin' || rol === 'administrator') {
+          console.log('Redirigiendo a admin-dashboard.html');
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          console.log('Redirigiendo a index.html');
+          window.location.href = 'index.html';
+        }
+
+      } catch (err) {
+        console.error('Error en autenticación:', err);
+        authStatusDiv.classList.add('hidden');
+        authErrorDiv.classList.remove('hidden');
+        errorMessageDiv.textContent = err.message || 'Error desconocido al verificar la sesión';
+      }
+    }
+
+    // Ejecutar al cargar la página
+    checkAuth();
+  </script>
 </body>
 </html>
