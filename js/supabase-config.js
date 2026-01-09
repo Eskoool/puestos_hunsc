@@ -8,9 +8,9 @@
  * 4. Reemplaza las variables SUPABASE_URL y SUPABASE_ANON_KEY
  */
 
-// ⚠️ REEMPLAZA ESTOS VALORES CON TUS CREDENCIALES DE SUPABASE
-const SUPABASE_URL = 'https://tu-proyecto.supabase.co';
-const SUPABASE_ANON_KEY = 'tu-anon-key-aqui';
+// ✅ CREDENCIALES DE SUPABASE CONFIGURADAS
+const SUPABASE_URL = 'https://julrvkllcifpcdyvbikr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1bHJ2a2xsY2lmcGNkeXZiaWtyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyNTk4NjUsImV4cCI6MjA2MjgzNTg2NX0.6EIGwcVca6dahNWJ3qniLGnhr2BOmqDLRr3y9C92GME';
 
 // Crear cliente de Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

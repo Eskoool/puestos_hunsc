@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Conexión Supabase</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .success { color: #10B981; font-weight: bold; }
+    .error { color: #EF4444; font-weight: bold; }
+    .loading { color: #6366F1; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+    pre {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+    }
+    button {
+      background: #5A0E6E;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔌 Test de Conexión a Supabase</h1>
+
+  <div class="card">
+    <h2>Estado de Conexión</h2>
+    <div id="connection-status" class="loading">⏳ Conectando...</div>
+    <div id="project-info"></div>
+  </div>
+
+  <div class="card">
+    <h2>Tablas Disponibles</h2>
+    <button onclick="loadTables()">🔄 Cargar Tablas</button>
+    <button onclick="testQueries()">🧪 Test de Consultas</button>
+    <div id="tables-container"></div>
+  </div>
+
+  <div class="card">
+    <h2>Resultado de Tests</h2>
+    <div id="test-results"></div>
+  </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    let tablesInfo = {};
+
+    async function checkConnection() {
+      const statusDiv = document.getElementById('connection-status');
+      const infoDiv = document.getElementById('project-info');
+
+      try {
+        // Test simple de conexión
+        const { data, error } = await supabase.from('usuarios').select('count').limit(1);
+
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
+
+        statusDiv.className = 'success';
+        statusDiv.textContent = '✅ Conexión exitosa a Supabase';
+
+        infoDiv.innerHTML = `
+          <p><strong>URL:</strong> ${SUPABASE_URL}</p>
+          <p><strong>Estado:</strong> Conectado correctamente</p>
+        `;
+
+        // Cargar tablas automáticamente
+        loadTables();
+
+      } catch (error) {
+        statusDiv.className = 'error';
+        statusDiv.textContent = '❌ Error de conexión';
+        infoDiv.innerHTML = `<p style="color: #EF4444;">${error.message}</p>`;
+      }
+    }
+
+    async function loadTables() {
+      const container = document.getElementById('tables-container');
+      container.innerHTML = '<p class="loading">⏳ Consultando tablas...</p>';
+
+      try {
+        // Lista de tablas comunes que podría tener
+        const possibleTables = [
+          'usuarios', 'personal', 'users',
+          'areas', 'departamentos',
+          'puestos', 'posiciones',
+          'asignaciones', 'assignments',
+          'guardias', 'turnos', 'shifts',
+          'vacaciones', 'holidays',
+          'plantas', 'floors',
+          'validaciones', 'validaciones_asignaciones',
+          'plantillas', 'templates'
+        ];
+
+        let foundTables = [];
+
+        for (const tableName of possibleTables) {
+          try {
+            const { data, error } = await supabase
+              .from(tableName)
+              .select('*')
+              .limit(1);
+
+            if (!error) {
+              // Tabla existe, obtener columnas
+              const columns = data && data.length > 0 ? Object.keys(data[0]) : [];
+
+              // Contar registros
+              const { count } = await supabase
+                .from(tableName)
+                .select('*', { count: 'exact', head: true });
+
+              foundTables.push({
+                name: tableName,
+                columns: columns,
+                count: count || 0
+              });
+
+              tablesInfo[tableName] = columns;
+            }
+          } catch (err) {
+            // Tabla no existe, continuar
+          }
+        }
+
+        if (foundTables.length === 0) {
+          container.innerHTML = '<p class="error">❌ No se encontraron tablas conocidas. Por favor revisa manualmente en Supabase.</p>';
+          return;
+        }
+
+        // Mostrar tablas encontradas
+        let html = `<p class="success">✅ Se encontraron ${foundTables.length} tabla(s):</p>`;
+
+        foundTables.forEach(table => {
+          html += `
+            <div style="margin: 20px 0; padding: 16px; background: #f9fafb; border-radius: 8px;">
+              <h3 style="margin: 0 0 12px 0;">📊 ${table.name}</h3>
+              <p><strong>Registros:</strong> ${table.count}</p>
+              <p><strong>Columnas (${table.columns.length}):</strong></p>
+              <pre>${table.columns.join(', ')}</pre>
+              <button onclick="showTableData('${table.name}')">👁️ Ver Datos</button>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+
+        // Generar código API
+        generateAPICode(foundTables);
+
+      } catch (error) {
+        container.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+
+    async function showTableData(tableName) {
+      const container = document.getElementById('test-results');
+      container.innerHTML = '<p class="loading">⏳ Cargando datos...</p>';
+
+      try {
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('*')
+          .limit(5);
+
+        if (error) throw error;
+
+        let html = `<h3>Datos de: ${tableName}</h3>`;
+
+        if (data.length === 0) {
+          html += '<p>La tabla está vacía</p>';
+        } else {
+          html += '<table><thead><tr>';
+          Object.keys(data[0]).forEach(col => {
+            html += `<th>${col}</th>`;
+          });
+          html += '</tr></thead><tbody>';
+
+          data.forEach(row => {
+            html += '<tr>';
+            Object.values(row).forEach(val => {
+              html += `<td>${val !== null ? val : '<em>null</em>'}</td>`;
+            });
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+        }
+
+        container.innerHTML = html;
+      } catch (error) {
+        container.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+
+    function generateAPICode(tables) {
+      const resultsDiv = document.getElementById('test-results');
+
+      let code = '// 📋 ESTRUCTURA DE TUS TABLAS EN SUPABASE\n\n';
+      code += '// Tablas encontradas:\n';
+      tables.forEach(table => {
+        code += `// - ${table.name} (${table.count} registros)\n`;
+      });
+
+      code += '\n// Ejemplo de uso con tus tablas:\n\n';
+
+      if (tables.find(t => t.name === 'usuarios' || t.name === 'personal')) {
+        const tableName = tables.find(t => t.name === 'usuarios') ? 'usuarios' : 'personal';
+        code += `// Cargar ${tableName}\n`;
+        code += `const ${tableName} = await supabaseAPI.${tableName}.getAll();\n\n`;
+      }
+
+      resultsDiv.innerHTML = `
+        <h3>💻 Código Generado</h3>
+        <pre>${code}</pre>
+        <p style="margin-top: 16px;">
+          <strong>✅ Próximos pasos:</strong><br>
+          1. Copia esta información<br>
+          2. Avísame qué tablas encontraste<br>
+          3. Actualizaré supabase-api.js con tus tablas exactas
+        </p>
+      `;
+    }
+
+    async function testQueries() {
+      const resultsDiv = document.getElementById('test-results');
+      resultsDiv.innerHTML = '<h3>🧪 Ejecutando Tests...</h3><p class="loading">⏳ Probando consultas...</p>';
+
+      let results = [];
+
+      // Test 1: Listar tablas encontradas
+      for (const tableName in tablesInfo) {
+        try {
+          const { count, error } = await supabase
+            .from(tableName)
+            .select('*', { count: 'exact', head: true });
+
+          if (!error) {
+            results.push(`✅ ${tableName}: ${count} registros`);
+          }
+        } catch (err) {
+          results.push(`❌ ${tableName}: ${err.message}`);
+        }
+      }
+
+      resultsDiv.innerHTML = `
+        <h3>🧪 Resultados de Tests</h3>
+        <pre>${results.join('\n')}</pre>
+      `;
+    }
+
+    // Ejecutar al cargar
+    checkConnection();
+  </script>
+</body>
+</html>
