@@ -110,7 +110,33 @@
       const errorMessageDiv = document.getElementById('error-message');
 
       try {
-        // Verificar sesión de Supabase
+        // PASO 1: Verificar si viene token en la URL (redirect desde Lovable)
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get('access_token');
+        const refreshToken = urlParams.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          console.log('✅ Token recibido desde Lovable, estableciendo sesión...');
+
+          // Establecer sesión con los tokens recibidos
+          const { data, error } = await supabaseClient.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          if (error) {
+            throw new Error('Error estableciendo sesión: ' + error.message);
+          }
+
+          console.log('✅ Sesión establecida correctamente');
+
+          // Limpiar URL (quitar tokens de la barra de direcciones)
+          window.history.replaceState({}, document.title, window.location.pathname);
+
+          // Continuar con la verificación normal
+        }
+
+        // PASO 2: Verificar sesión de Supabase (existente o recién creada)
         const { data: { session }, error } = await supabaseClient.auth.getSession();
 
         if (error) {
@@ -125,7 +151,7 @@
           return;
         }
 
-        // Hay sesión, cargar datos del usuario
+        // PASO 3: Hay sesión, cargar datos del usuario
         console.log('Sesión encontrada, cargando usuario...');
 
         const { data: authUser } = await supabaseClient.auth.getUser();
@@ -143,7 +169,7 @@
 
         console.log('Usuario encontrado:', userData);
 
-        // Determinar rol y redirigir
+        // PASO 4: Determinar rol y redirigir
         const rol = (userData.rol || userData.role || '').toLowerCase();
 
         if (rol === 'administrador' || rol === 'admin' || rol === 'administrator') {
