@@ -110,6 +110,26 @@
       const errorMessageDiv = document.getElementById('error-message');
 
       try {
+        // VERIFICACIÓN INICIAL: Asegurar que Supabase está cargado
+        if (typeof window.supabaseClient === 'undefined') {
+          console.error('❌ supabaseClient no está definido. Esperando...');
+
+          // Intentar esperar hasta que esté disponible (máximo 5 segundos)
+          let attempts = 0;
+          while (typeof window.supabaseClient === 'undefined' && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+          }
+
+          if (typeof window.supabaseClient === 'undefined') {
+            throw new Error('No se pudo cargar Supabase. Verifica que js/supabase-config.js esté accesible.');
+          }
+
+          console.log('✅ supabaseClient cargado después de esperar');
+        }
+
+        console.log('✅ supabaseClient disponible:', typeof window.supabaseClient);
+
         // PASO 1: Verificar si viene SSO token en la URL (redirect desde Lovable)
         const urlParams = new URLSearchParams(window.location.search);
         const ssoToken = urlParams.get('sso_token');
