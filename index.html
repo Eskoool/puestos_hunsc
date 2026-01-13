@@ -272,12 +272,24 @@
             userRoleEl.textContent = user.rol;
           }
 
-          // Actualizar avatar en navegación móvil (inicial del nombre)
-          const avatarEls = document.querySelectorAll('.rounded-full .text-white');
+          // Actualizar avatares con iniciales (nombre + apellido)
+          let initials = 'U';
+          if (user.nombre) {
+            const nameParts = user.nombre.trim().split(' ');
+            if (nameParts.length >= 2) {
+              // Primera letra del nombre + primera letra del primer apellido
+              initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+            } else {
+              // Solo la primera letra si no hay apellido
+              initials = nameParts[0].charAt(0).toUpperCase();
+            }
+          }
+
+          // Actualizar todos los avatares
+          const avatarEls = document.querySelectorAll('.rounded-full .text-white, .rounded-full.text-white');
           avatarEls.forEach(avatar => {
-            if (user.nombre && avatar.textContent === 'M') {
-              const initial = user.nombre.charAt(0).toUpperCase();
-              avatar.textContent = initial;
+            if (user.nombre) {
+              avatar.textContent = initials;
             }
           });
 

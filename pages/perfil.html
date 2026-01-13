@@ -68,8 +68,8 @@
           <button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <span class="material-symbols-outlined text-gray-600">notifications</span>
           </button>
-          <a href="perfil.html" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
-            M
+          <a href="perfil.html" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil" id="nav-avatar">
+            YG
           </a>
         </div>
       </div>
@@ -90,8 +90,8 @@
             </div>
             <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEegCLvttwSPhRm688obFlYgFFyUMOp8wlrL6kZzQA6BvReLkj_zuQCErgft6YP5cwM3jRn2bwDVY8onTCbtJIAUwPsd9Wa05I8g1vUKwLHJ6fq8x68ENrq_JqqKUK7Hg8b-UeRgzKLhkwwnmDGgMI9V46dFhKrR07Ru8CQv6Ef-0Drf5XiUZ9JQwqj0rECINs0BXL3f1qcduTx4l7smNC4lbh_QkGzDj6H4WywtDWVWenR2hOBUo1-uBL0sdjXbTkZEnQEdyvwJd5");'></div>
             <div class="flex flex-col items-center justify-center">
-              <p class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] text-center">Alejandro Martinez</p>
-              <p class="text-white/80 text-base font-medium leading-normal text-center">Técnico de Farmacia</p>
+              <p class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] text-center" id="user-name-profile">Usuario</p>
+              <p class="text-white/80 text-base font-medium leading-normal text-center" id="user-role-profile">Rol</p>
             </div>
           </div>
           <div class="flex w-full max-w-[480px] gap-3 @[480px]:w-auto">
@@ -105,13 +105,8 @@
         </div>
       </section>
 
-      <!-- Área asignada y estadísticas -->
+      <!-- Estadísticas del usuario -->
       <section class="flex flex-col gap-4 p-4">
-        <div class="flex w-full flex-col gap-2 rounded-lg p-6 border border-white/20 bg-black/10 backdrop-blur-md items-center">
-          <span class="material-symbols-outlined text-white/80 text-3xl">assignment_ind</span>
-          <p class="text-white/80 text-base font-medium leading-normal mt-1">Área Asignada</p>
-          <p class="text-white tracking-light text-2xl font-bold leading-tight">Dispensación Ambulatoria</p>
-        </div>
         <div class="flex flex-wrap gap-4">
           <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-white/20 bg-black/10 backdrop-blur-md">
             <p class="text-white/80 text-base font-medium leading-normal">Vacaciones</p>
@@ -218,8 +213,8 @@
         <span class="text-xs mt-1">Áreas</span>
       </a>
       <a href="perfil.html" class="flex flex-col items-center justify-center text-primary">
-        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white text-sm font-bold">
-          M
+        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white text-sm font-bold" id="mobile-avatar">
+          YG
         </div>
         <span class="text-xs font-medium mt-1">Perfil</span>
       </a>
@@ -228,5 +223,72 @@
 
   <!-- Espaciado para navegación móvil -->
   <div class="h-16 lg:hidden"></div>
+
+  <!-- Script para cargar datos del usuario -->
+  <script>
+    // Cargar datos del usuario desde sessionStorage
+    function loadUserData() {
+      try {
+        const ssoUser = sessionStorage.getItem('sso_user');
+
+        if (ssoUser) {
+          const user = JSON.parse(ssoUser);
+
+          // Actualizar nombre del usuario en perfil
+          const userNameEl = document.getElementById('user-name-profile');
+          if (userNameEl && user.nombre) {
+            userNameEl.textContent = user.nombre;
+          }
+
+          // Actualizar rol del usuario en perfil
+          const userRoleEl = document.getElementById('user-role-profile');
+          if (userRoleEl && user.rol) {
+            userRoleEl.textContent = user.rol;
+          }
+
+          // Calcular iniciales (primera letra nombre + primera letra apellido)
+          let initials = 'U';
+          if (user.nombre) {
+            const nameParts = user.nombre.trim().split(' ');
+            if (nameParts.length >= 2) {
+              // Primera letra del nombre + primera letra del primer apellido
+              initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+            } else {
+              // Solo la primera letra si no hay apellido
+              initials = nameParts[0].charAt(0).toUpperCase();
+            }
+          }
+
+          // Actualizar avatares con las iniciales
+          const navAvatar = document.getElementById('nav-avatar');
+          if (navAvatar) {
+            navAvatar.textContent = initials;
+          }
+
+          const mobileAvatar = document.getElementById('mobile-avatar');
+          if (mobileAvatar) {
+            mobileAvatar.textContent = initials;
+          }
+
+          console.log('✅ Datos de perfil cargados:', {
+            nombre: user.nombre,
+            rol: user.rol,
+            iniciales: initials
+          });
+        } else {
+          console.warn('⚠️ No hay datos de usuario en sessionStorage');
+        }
+      } catch (error) {
+        console.error('❌ Error cargando datos de usuario:', error);
+      }
+    }
+
+    // Ejecutar al cargar la página
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadUserData);
+    } else {
+      loadUserData();
+    }
+  </script>
 </body>
 </html>
