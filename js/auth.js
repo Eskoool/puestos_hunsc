@@ -245,22 +245,38 @@ async function logout() {
 
 /**
  * Escuchar cambios en la autenticación
+ * Nota: Solo se ejecuta cuando supabaseClient está disponible
  */
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-  console.log('Auth state changed:', event);
-
-  if (event === 'SIGNED_IN') {
-    console.log('Usuario inició sesión');
-    await initAuth();
-  } else if (event === 'SIGNED_OUT') {
-    console.log('Usuario cerró sesión');
-    currentUser = null;
-    userRole = null;
-    redirectToLogin();
-  } else if (event === 'TOKEN_REFRESHED') {
-    console.log('Token renovado');
+function setupAuthListener() {
+  if (typeof window.supabaseClient === 'undefined') {
+    console.warn('⚠️ supabaseClient no disponible aún para listener');
+    return;
   }
-});
+
+  window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    console.log('Auth state changed:', event);
+
+    if (event === 'SIGNED_IN') {
+      console.log('Usuario inició sesión');
+      await initAuth();
+    } else if (event === 'SIGNED_OUT') {
+      console.log('Usuario cerró sesión');
+      currentUser = null;
+      userRole = null;
+      redirectToLogin();
+    } else if (event === 'TOKEN_REFRESHED') {
+      console.log('Token renovado');
+    }
+  });
+}
+
+// Ejecutar listener solo después de que el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupAuthListener);
+} else {
+  // DOM ya está listo
+  setupAuthListener();
+}
 
 /**
  * Obtener usuario actual
