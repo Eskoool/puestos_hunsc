@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Diagnóstico Supabase - Farmacia HUNSC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1a1a1a;
+      color: #00ff00;
+    }
+    .log-line {
+      padding: 4px 8px;
+      margin: 2px 0;
+      border-left: 3px solid #00ff00;
+    }
+    .log-success { color: #00ff00; }
+    .log-error { color: #ff0000; border-left-color: #ff0000; }
+    .log-warning { color: #ffaa00; border-left-color: #ffaa00; }
+    .log-info { color: #00aaff; border-left-color: #00aaff; }
+    pre {
+      background: #000;
+      padding: 12px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body class="p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-4">🔍 Diagnóstico de Supabase</h1>
+    <p class="mb-6 text-gray-400">Verificando conexión y estructura de la base de datos...</p>
+
+    <div class="bg-black p-6 rounded-lg mb-6">
+      <div id="logs" class="space-y-1"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-gray-900 p-4 rounded">
+        <h3 class="text-xl mb-2">📊 Resumen</h3>
+        <div id="summary"></div>
+      </div>
+      <div class="bg-gray-900 p-4 rounded">
+        <h3 class="text-xl mb-2">🔧 Acciones</h3>
+        <div id="actions"></div>
+      </div>
+    </div>
+
+    <div class="mt-6 bg-gray-900 p-4 rounded">
+      <h3 class="text-xl mb-2">📝 Datos de Prueba</h3>
+      <pre id="test-data" class="text-xs"></pre>
+    </div>
+  </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    const logsDiv = document.getElementById('logs');
+    const summaryDiv = document.getElementById('summary');
+    const actionsDiv = document.getElementById('actions');
+    const testDataDiv = document.getElementById('test-data');
+
+    const results = {
+      connection: false,
+      usersTable: false,
+      userCount: 0,
+      roles: {},
+      errors: []
+    };
+
+    function log(message, type = 'info') {
+      const line = document.createElement('div');
+      line.className = `log-line log-${type}`;
+
+      const icon = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: '🔍'
+      }[type] || '•';
+
+      line.textContent = `${icon} ${message}`;
+      logsDiv.appendChild(line);
+      console.log(`[${type.toUpperCase()}]`, message);
+    }
+
+    function updateSummary() {
+      summaryDiv.innerHTML = `
+        <div class="space-y-2 text-sm">
+          <div>Conexión: ${results.connection ? '<span class="text-green-500">✅ OK</span>' : '<span class="text-red-500">❌ Error</span>'}</div>
+          <div>Tabla users: ${results.usersTable ? '<span class="text-green-500">✅ Existe</span>' : '<span class="text-red-500">❌ No existe</span>'}</div>
+          <div>Total usuarios: <span class="text-blue-400">${results.userCount}</span></div>
+          <div>Roles encontrados: <span class="text-blue-400">${Object.keys(results.roles).length}</span></div>
+        </div>
+      `;
+    }
+
+    function updateActions() {
+      let html = '<div class="space-y-2 text-sm">';
+
+      if (!results.usersTable) {
+        html += `
+          <button onclick="createUsersTable()" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+            Crear Tabla "users"
+          </button>
+        `;
+      }
+
+      if (results.usersTable && results.userCount === 0) {
+        html += `
+          <button onclick="createTestUser()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+            Crear Usuario de Prueba
+          </button>
+        `;
+      }
+
+      html += `
+        <button onclick="runDiagnostic()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">
+          🔄 Volver a Verificar
+        </button>
+      `;
+
+      html += '</div>';
+      actionsDiv.innerHTML = html;
+    }
+
+    async function createUsersTable() {
+      log('Intentando crear tabla "users"...', 'info');
+
+      // Crear la tabla via SQL
+      const sqlQuery = `
+        CREATE TABLE IF NOT EXISTS users (
+          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          nombre VARCHAR(255),
+          rol VARCHAR(50) NOT NULL,
+          hospital VARCHAR(100),
+          avatar_url TEXT,
+          telefono VARCHAR(20),
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+      `;
+
+      log('SQL: ' + sqlQuery, 'info');
+      log('⚠️  Necesitas ejecutar este SQL en el dashboard de Supabase:', 'warning');
+      log('https://supabase.com/dashboard/project/julrvkllcifpcdyvbikr/editor', 'info');
+
+      alert('Por favor, copia el SQL que aparece en los logs y ejecútalo en el SQL Editor de Supabase');
+    }
+
+    async function createTestUser() {
+      log('Creando usuario de prueba...', 'info');
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('users')
+          .insert({
+            email: 'admin@hunsc.es',
+            nombre: 'Administrador Test',
+            rol: 'administrador',
+            hospital: 'HUNSC-Sur'
+          })
+          .select()
+          .single();
+
+        if (error) {
+          log('Error al crear usuario: ' + error.message, 'error');
+          results.errors.push(error.message);
+        } else {
+          log('✅ Usuario de prueba creado:', 'success');
+          log(JSON.stringify(data, null, 2), 'success');
+          testDataDiv.textContent = JSON.stringify(data, null, 2);
+          await runDiagnostic();
+        }
+      } catch (err) {
+        log('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function runDiagnostic() {
+      logsDiv.innerHTML = '';
+      log('Iniciando diagnóstico...', 'info');
+      log('URL: https://julrvkllcifpcdyvbikr.supabase.co', 'info');
+      log('', 'info');
+
+      // Test 1: Verificar conexión
+      log('Test 1: Verificando conexión básica...', 'info');
+      try {
+        const { data, error } = await supabaseClient
+          .from('users')
+          .select('count', { count: 'exact', head: true });
+
+        if (error) {
+          if (error.message.includes('relation "users" does not exist')) {
+            log('La tabla "users" no existe aún', 'warning');
+            results.connection = true;
+            results.usersTable = false;
+          } else {
+            log('Error de conexión: ' + error.message, 'error');
+            results.errors.push(error.message);
+          }
+        } else {
+          log('Conexión exitosa', 'success');
+          results.connection = true;
+          results.usersTable = true;
+        }
+      } catch (err) {
+        log('Error al conectar: ' + err.message, 'error');
+        results.errors.push(err.message);
+      }
+
+      log('', 'info');
+
+      // Test 2: Verificar tabla users
+      if (results.connection) {
+        log('Test 2: Verificando tabla "users"...', 'info');
+
+        try {
+          const { data, error, count } = await supabaseClient
+            .from('users')
+            .select('*', { count: 'exact' });
+
+          if (error) {
+            log('Error: ' + error.message, 'error');
+            results.usersTable = false;
+          } else {
+            log('Tabla "users" encontrada', 'success');
+            log(`Total de registros: ${count || 0}`, 'info');
+            results.usersTable = true;
+            results.userCount = count || 0;
+
+            if (data && data.length > 0) {
+              log('Ejemplo de datos:', 'info');
+              testDataDiv.textContent = JSON.stringify(data, null, 2);
+
+              // Contar roles
+              results.roles = data.reduce((acc, user) => {
+                acc[user.rol] = (acc[user.rol] || 0) + 1;
+                return acc;
+              }, {});
+
+              log('Distribución de roles:', 'info');
+              Object.entries(results.roles).forEach(([rol, count]) => {
+                log(`  - ${rol}: ${count}`, 'info');
+              });
+            } else {
+              log('La tabla está vacía (sin usuarios)', 'warning');
+            }
+          }
+        } catch (err) {
+          log('Error al verificar tabla: ' + err.message, 'error');
+        }
+      }
+
+      log('', 'info');
+
+      // Test 3: Verificar columnas necesarias
+      if (results.usersTable && results.userCount > 0) {
+        log('Test 3: Verificando columnas requeridas...', 'info');
+
+        const requiredColumns = ['id', 'email', 'nombre', 'rol', 'hospital'];
+        const { data } = await supabaseClient
+          .from('users')
+          .select('*')
+          .limit(1);
+
+        if (data && data.length > 0) {
+          const existingColumns = Object.keys(data[0]);
+          const missingColumns = requiredColumns.filter(col => !existingColumns.includes(col));
+
+          if (missingColumns.length === 0) {
+            log('Todas las columnas requeridas están presentes', 'success');
+          } else {
+            log('Columnas faltantes: ' + missingColumns.join(', '), 'warning');
+          }
+
+          log('Columnas disponibles: ' + existingColumns.join(', '), 'info');
+        }
+      }
+
+      log('', 'info');
+      log('=== Diagnóstico Completado ===', 'success');
+
+      // Actualizar UI
+      updateSummary();
+      updateActions();
+    }
+
+    // Ejecutar diagnóstico al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      runDiagnostic();
+    });
+  </script>
+</body>
+</html>

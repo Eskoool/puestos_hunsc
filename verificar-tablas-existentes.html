@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Verificar Tablas Existentes - Supabase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">🔍 Verificar Tablas Existentes en Supabase</h1>
+
+    <div id="output" class="space-y-4"></div>
+
+    <button onclick="verificar()" class="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold">
+      🔄 Volver a Verificar
+    </button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    const output = document.getElementById('output');
+
+    function log(title, content, type = 'info') {
+      const colors = {
+        success: 'bg-green-900 border-green-500',
+        error: 'bg-red-900 border-red-500',
+        warning: 'bg-yellow-900 border-yellow-500',
+        info: 'bg-blue-900 border-blue-500'
+      };
+
+      const div = document.createElement('div');
+      div.className = `border-l-4 p-4 ${colors[type]}`;
+      div.innerHTML = `
+        <h3 class="font-bold mb-2">${title}</h3>
+        <pre class="text-sm overflow-x-auto">${content}</pre>
+      `;
+      output.appendChild(div);
+    }
+
+    async function verificar() {
+      output.innerHTML = '<p class="text-gray-400">Verificando...</p>';
+
+      try {
+        // 1. Verificar tabla users
+        log('📋 Tabla: users', 'Consultando estructura...', 'info');
+
+        const { data: usersData, error: usersError } = await supabaseClient
+          .from('users')
+          .select('*')
+          .limit(5);
+
+        if (usersError) {
+          log('❌ Error en tabla users', usersError.message, 'error');
+        } else {
+          log('✅ Tabla users - OK',
+            `Total registros encontrados: ${usersData.length}\n\n` +
+            'Estructura de columnas:\n' +
+            (usersData.length > 0
+              ? Object.keys(usersData[0]).join(', ')
+              : 'Tabla vacía') +
+            '\n\nEjemplo de datos:\n' +
+            JSON.stringify(usersData[0] || {}, null, 2),
+            'success'
+          );
+        }
+
+        // 2. Verificar tabla profiles
+        log('📋 Tabla: profiles', 'Consultando estructura...', 'info');
+
+        const { data: profilesData, error: profilesError } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .limit(5);
+
+        if (profilesError) {
+          log('❌ Error en tabla profiles', profilesError.message, 'error');
+        } else {
+          log('✅ Tabla profiles - OK',
+            `Total registros encontrados: ${profilesData.length}\n\n` +
+            'Estructura de columnas:\n' +
+            (profilesData.length > 0
+              ? Object.keys(profilesData[0]).join(', ')
+              : 'Tabla vacía') +
+            '\n\nEjemplo de datos:\n' +
+            JSON.stringify(profilesData[0] || {}, null, 2),
+            'success'
+          );
+        }
+
+        // 3. Verificar relación entre tablas
+        log('🔗 Verificando relación entre users y profiles', 'Analizando...', 'info');
+
+        // Intentar join
+        const { data: joinData, error: joinError } = await supabaseClient
+          .from('users')
+          .select(`
+            *,
+            profiles (*)
+          `)
+          .limit(2);
+
+        if (joinError) {
+          log('⚠️ No se pudo hacer JOIN',
+            'Las tablas pueden no estar relacionadas\n' + joinError.message,
+            'warning'
+          );
+        } else {
+          log('✅ Relación verificada',
+            'Ejemplo de JOIN:\n' + JSON.stringify(joinData, null, 2),
+            'success'
+          );
+        }
+
+        // 4. Verificar usuarios con roles
+        log('👥 Verificando roles de usuarios', 'Analizando...', 'info');
+
+        const { data: rolesData, error: rolesError } = await supabaseClient
+          .from('users')
+          .select('rol, role')
+          .limit(10);
+
+        if (!rolesError && rolesData) {
+          const roles = {};
+          rolesData.forEach(u => {
+            const rol = u.rol || u.role;
+            if (rol) roles[rol] = (roles[rol] || 0) + 1;
+          });
+
+          log('📊 Distribución de roles',
+            Object.entries(roles)
+              .map(([rol, count]) => `${rol}: ${count}`)
+              .join('\n') || 'No se encontraron roles',
+            'info'
+          );
+        }
+
+        // 5. Mostrar configuración recomendada
+        log('📝 Configuración para la aplicación',
+          'Basado en las tablas existentes, la aplicación debe:\n' +
+          '1. Buscar usuarios en la tabla "users"\n' +
+          '2. El campo de rol puede ser "rol" o "role"\n' +
+          '3. Verificar si hay relación con "profiles"\n' +
+          '4. Adaptar login.html y auth.js según estructura encontrada',
+          'info'
+        );
+
+      } catch (err) {
+        log('❌ Error general', err.message + '\n' + err.stack, 'error');
+      }
+    }
+
+    // Ejecutar al cargar
+    verificar();
+  </script>
+</body>
+</html>
