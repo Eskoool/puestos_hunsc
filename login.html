@@ -131,27 +131,67 @@
 
             console.log('✅ Token SSO válido:', decoded);
 
-            // Crear/actualizar usuario en Supabase tabla 'users'
-            const { data: userData, error: upsertError } = await supabaseClient
-              .from('users')
-              .upsert({
-                email: decoded.email,
-                nombre: `${decoded.name} ${decoded.surname}`.trim(),
-                rol: decoded.role,
-                hospital: decoded.hospital,
-                updated_at: new Date().toISOString()
-              }, {
-                onConflict: 'email'
-              })
-              .select()
-              .single();
+            // Crear/actualizar usuario en Supabase - Adaptativo para tablas existentes
+            console.log('🔍 Buscando usuario en tabla "users"...');
 
-            if (upsertError) {
-              console.error('Error actualizando usuario:', upsertError);
-              throw new Error('Error sincronizando usuario con la base de datos');
+            // Primero intentar buscar el usuario existente
+            const { data: existingUser, error: searchError } = await supabaseClient
+              .from('users')
+              .select('*')
+              .eq('email', decoded.email)
+              .maybeSingle();
+
+            let userData;
+
+            if (existingUser) {
+              // Usuario existe, usar sus datos
+              console.log('✅ Usuario encontrado en la base de datos:', existingUser);
+              userData = existingUser;
+            } else {
+              // Usuario no existe, intentar crearlo (adaptativo)
+              console.log('⚠️  Usuario no encontrado, intentando crear...');
+
+              // Construir payload dinámicamente basado en campos comunes
+              const userPayload = { email: decoded.email };
+
+              // Agregar campos opcionales si existen
+              if (decoded.name && decoded.surname) {
+                userPayload.nombre = `${decoded.name} ${decoded.surname}`.trim();
+                userPayload.name = userPayload.nombre; // Soportar ambos nombres
+              }
+              if (decoded.role) {
+                userPayload.rol = decoded.role;
+                userPayload.role = decoded.role; // Soportar ambos nombres
+              }
+              if (decoded.hospital) {
+                userPayload.hospital = decoded.hospital;
+              }
+
+              const { data: newUser, error: insertError } = await supabaseClient
+                .from('users')
+                .upsert(userPayload, { onConflict: 'email' })
+                .select()
+                .single();
+
+              if (insertError) {
+                console.error('⚠️  Error al crear usuario:', insertError.message);
+                console.log('✅ Continuando con datos del token SSO...');
+
+                // Usar datos del token si falla la inserción
+                userData = {
+                  email: decoded.email,
+                  nombre: `${decoded.name} ${decoded.surname}`.trim(),
+                  rol: decoded.role,
+                  role: decoded.role,
+                  hospital: decoded.hospital
+                };
+              } else {
+                console.log('✅ Usuario creado en Supabase:', newUser);
+                userData = newUser;
+              }
             }
 
-            console.log('✅ Usuario sincronizado en Supabase:', userData);
+            console.log('✅ Datos del usuario para sesión:', userData);
 
             // Crear sesión de Supabase usando magic link
             // (Necesitamos crear una sesión válida para que funcione el resto de la app)
@@ -167,21 +207,29 @@
               // Continuar de todas formas, guardaremos en sessionStorage
             }
 
-            // Guardar datos del usuario en sessionStorage
+            // Guardar datos del usuario en sessionStorage (adaptativo)
+            const userRol = userData.rol || userData.role || decoded.role || 'usuario';
+            const userNombre = userData.nombre || userData.name || `${decoded.name} ${decoded.surname}`.trim();
+
             sessionStorage.setItem('sso_user', JSON.stringify({
-              id: userData.id,
-              email: decoded.email,
-              nombre: `${decoded.name} ${decoded.surname}`.trim(),
-              rol: decoded.role,
-              hospital: decoded.hospital,
+              id: userData.id || decoded.sub,
+              email: userData.email || decoded.email,
+              nombre: userNombre,
+              rol: userRol,
+              hospital: userData.hospital || decoded.hospital || 'HUNSC-Sur',
               exp: decoded.exp
             }));
+
+            console.log('✅ Sesión guardada en sessionStorage:', {
+              email: userData.email || decoded.email,
+              rol: userRol
+            });
 
             // Limpiar URL
             window.history.replaceState({}, document.title, window.location.pathname);
 
             // Redirigir según rol
-            const rol = (decoded.role || '').toLowerCase();
+            const rol = (userRol || '').toLowerCase();
             if (rol === 'administrador' || rol === 'admin' || rol === 'administrator') {
               console.log('Redirigiendo a admin-dashboard.html');
               window.location.href = 'admin-dashboard.html';
@@ -234,26 +282,49 @@
           return;
         }
 
-        // PASO 3: Hay sesión, cargar datos del usuario
+        // PASO 3: Hay sesión, cargar datos del usuario (adaptativo)
         console.log('Sesión encontrada, cargando usuario...');
 
         const { data: authUser } = await supabaseClient.auth.getUser();
 
         // Buscar usuario en tabla users
-        const { data: userData, error: userError } = await supabaseClient
+        let { data: userData, error: userError } = await supabaseClient
           .from('users')
           .select('*')
           .eq('email', authUser.user.email)
-          .single();
+          .maybeSingle();
 
-        if (userError || !userData) {
-          throw new Error('Usuario no encontrado en la base de datos');
+        if (userError) {
+          console.error('⚠️  Error al buscar en tabla users:', userError.message);
         }
 
-        console.log('Usuario encontrado:', userData);
+        // Si no se encuentra en users, intentar con profiles
+        if (!userData) {
+          console.log('🔍 Usuario no encontrado en "users", intentando tabla "profiles"...');
 
-        // PASO 4: Determinar rol y redirigir
-        const rol = (userData.rol || userData.role || '').toLowerCase();
+          const { data: profileData, error: profileError } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('email', authUser.user.email)
+            .maybeSingle();
+
+          if (profileError) {
+            console.error('⚠️  Error al buscar en tabla profiles:', profileError.message);
+          } else if (profileData) {
+            console.log('✅ Usuario encontrado en tabla "profiles"');
+            userData = profileData;
+          }
+        }
+
+        if (!userData) {
+          console.error('❌ Usuario no encontrado en ninguna tabla');
+          throw new Error('Usuario no encontrado en la base de datos. Contacte al administrador.');
+        }
+
+        console.log('✅ Usuario encontrado:', userData);
+
+        // PASO 4: Determinar rol y redirigir (adaptativo para diferentes nombres de columnas)
+        const rol = (userData.rol || userData.role || userData.tipo || 'usuario').toLowerCase();
 
         if (rol === 'administrador' || rol === 'admin' || rol === 'administrator') {
           console.log('Redirigiendo a admin-dashboard.html');

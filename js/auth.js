@@ -27,11 +27,12 @@ async function initAuth() {
           currentUser = {
             id: parsed.id,
             email: parsed.email,
-            nombre: parsed.nombre,
-            rol: parsed.rol,
+            nombre: parsed.nombre || parsed.name,
+            rol: parsed.rol || parsed.role || parsed.tipo,
             hospital: parsed.hospital
           };
-          userRole = parsed.rol;
+          // Normalizar rol desde múltiples posibles nombres de campo
+          userRole = parsed.rol || parsed.role || parsed.tipo || parsed.user_role || 'usuario';
 
           console.log('✅ Usuario autenticado via SSO:', currentUser.email, '- Rol:', userRole);
           return currentUser;
@@ -70,7 +71,8 @@ async function initAuth() {
     }
 
     currentUser = userData;
-    userRole = userData.rol || userData.role; // Soportar ambos nombres
+    // Soportar múltiples nombres de columna para rol
+    userRole = userData.rol || userData.role || userData.tipo || userData.user_role || 'usuario';
 
     console.log('✅ Usuario autenticado:', currentUser.email, '- Rol:', userRole);
 
@@ -84,7 +86,7 @@ async function initAuth() {
 }
 
 /**
- * Cargar datos completos del usuario desde la tabla users
+ * Cargar datos completos del usuario desde las tablas users o profiles (adaptativo)
  */
 async function loadUserData(userId) {
   try {
@@ -97,14 +99,36 @@ async function loadUserData(userId) {
     }
 
     // Buscar en tabla users por email
-    const { data, error } = await supabaseClient
+    let { data, error } = await supabaseClient
       .from('users')
       .select('*')
       .eq('email', authUser.user.email)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      console.error('Error cargando usuario de tabla users:', error);
+      console.error('⚠️  Error cargando usuario de tabla users:', error.message);
+    }
+
+    // Si no se encuentra en users, intentar con profiles
+    if (!data) {
+      console.log('🔍 Intentando buscar en tabla "profiles"...');
+
+      const { data: profileData, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('email', authUser.user.email)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('⚠️  Error cargando usuario de tabla profiles:', profileError.message);
+      } else if (profileData) {
+        console.log('✅ Usuario encontrado en tabla "profiles"');
+        data = profileData;
+      }
+    }
+
+    if (!data) {
+      console.error('❌ Usuario no encontrado en ninguna tabla (users/profiles)');
       return null;
     }
 
