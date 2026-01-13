@@ -1,0 +1,261 @@
+{
+  "name": "SSO LDAP - Farmacia HUNSC",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth/sso-login",
+        "options": {
+          "responseMode": "responseNode"
+        }
+      },
+      "name": "Webhook - Recibir Login",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "sso-login-webhook"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extraer datos del payload\nconst payload = $input.item.json.body;\n\n// Validar que vengan los datos necesarios\nif (!payload.email || !payload.password) {\n  return {\n    json: {\n      success: false,\n      error: 'Email y password son requeridos',\n      code: 'MISSING_CREDENTIALS'\n    }\n  };\n}\n\n// Preparar datos para LDAP\nreturn {\n  json: {\n    email: payload.email,\n    password: payload.password,\n    name: payload.name || '',\n    surname: payload.surname || '',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "Validar Payload",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "ldap",
+        "dn": "={{ $json.email }}",
+        "password": "={{ $json.password }}",
+        "baseDN": "dc=hunsc,dc=es",
+        "searchFilter": "(&(objectClass=person)(mail={{ $json.email }}))",
+        "attributes": "mail,cn,sn,givenName,memberOf"
+      },
+      "name": "LDAP - Autenticar",
+      "type": "n8n-nodes-base.ldap",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "ldap": {
+          "id": "1",
+          "name": "LDAP HUNSC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.error }}",
+              "operation": "isEmpty"
+            }
+          ]
+        }
+      },
+      "name": "¿LDAP OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Usuario autenticado correctamente por LDAP\nconst ldapData = $input.item.json;\nconst originalPayload = $('Validar Payload').item.json;\n\n// Extraer rol desde grupos de LDAP\nlet role = 'usuario';\n\nif (ldapData.memberOf) {\n  const groups = Array.isArray(ldapData.memberOf) ? ldapData.memberOf : [ldapData.memberOf];\n  \n  if (groups.some(g => g.includes('CN=Administradores') || g.includes('CN=Admins'))) {\n    role = 'administrador';\n  } else if (groups.some(g => g.includes('CN=Farmaceuticos'))) {\n    role = 'farmaceutico';\n  } else if (groups.some(g => g.includes('CN=FIR'))) {\n    role = 'FIR';\n  }\n}\n\n// Crear payload del SSO token\nconst ssoPayload = {\n  sub: ldapData.mail || originalPayload.email,\n  email: ldapData.mail || originalPayload.email,\n  name: ldapData.givenName || originalPayload.name || 'Usuario',\n  surname: ldapData.sn || originalPayload.surname || '',\n  role: role,\n  hospital: 'HUNSC-Sur',\n  exp: Math.floor(Date.now() / 1000) + (5 * 60) // Expira en 5 minutos\n};\n\n// Codificar en base64\nconst ssoToken = Buffer.from(JSON.stringify(ssoPayload)).toString('base64');\n\nreturn {\n  json: {\n    success: true,\n    ssoToken: ssoToken,\n    user: {\n      email: ssoPayload.email,\n      name: ssoPayload.name,\n      surname: ssoPayload.surname,\n      role: ssoPayload.role\n    }\n  }\n};"
+      },
+      "name": "Generar SSO Token",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Error de autenticación LDAP\nconst errorData = $input.item.json;\n\nreturn {\n  json: {\n    success: false,\n    error: 'Credenciales LDAP inválidas',\n    code: 'LDAP_AUTH_FAILED',\n    details: errorData.error || 'No se pudo autenticar con LDAP'\n  }\n};"
+      },
+      "name": "Error LDAP",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "¿Éxito?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Respuesta - Éxito",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 401,
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Respuesta - Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 400]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO users (email, nombre, rol, hospital, updated_at)\nVALUES (\n  '{{ $json.user.email }}',\n  '{{ $json.user.name }} {{ $json.user.surname }}',\n  '{{ $json.user.role }}',\n  'HUNSC-Sur',\n  NOW()\n)\nON CONFLICT (email) DO UPDATE SET\n  nombre = EXCLUDED.nombre,\n  rol = EXCLUDED.rol,\n  updated_at = NOW()\nRETURNING *;"
+      },
+      "name": "Supabase - Sincronizar Usuario",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1250, 100],
+      "credentials": {
+        "postgres": {
+          "id": "2",
+          "name": "Supabase HUNSC"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Recibir Login": {
+      "main": [
+        [
+          {
+            "node": "Validar Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Payload": {
+      "main": [
+        [
+          {
+            "node": "LDAP - Autenticar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LDAP - Autenticar": {
+      "main": [
+        [
+          {
+            "node": "¿LDAP OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿LDAP OK?": {
+      "main": [
+        [
+          {
+            "node": "Generar SSO Token",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error LDAP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar SSO Token": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Sincronizar Usuario",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "¿Éxito?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error LDAP": {
+      "main": [
+        [
+          {
+            "node": "¿Éxito?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Éxito?": {
+      "main": [
+        [
+          {
+            "node": "Respuesta - Éxito",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta - Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "pinData": {},
+  "versionId": "1"
+}

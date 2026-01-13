@@ -116,9 +116,10 @@
         const accessToken = urlParams.get('access_token');
         const refreshToken = urlParams.get('refresh_token');
 
-        // OPCIÓN A: SSO Token de Lovable (NUEVO - RECOMENDADO)
+        // OPCIÓN A: SSO Token desde n8n + LDAP (RECOMENDADO)
         if (ssoToken) {
-          console.log('✅ SSO Token recibido desde Lovable, procesando...');
+          console.log('✅ SSO Token recibido (desde n8n/Lovable), procesando...');
+          console.log('🔐 Token generado y validado por n8n con LDAP');
 
           try {
             // Decodificar el token SSO (base64)
