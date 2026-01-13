@@ -88,8 +88,8 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Bienvenida, María 👋</h1>
-      <p class="text-gray-600">Aquí está tu resumen del día</p>
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Bienvenida, <span id="user-name">Usuario</span> 👋</h1>
+      <p class="text-gray-600">Aquí está tu resumen del día - <span id="user-role"></span></p>
     </div>
 
     <!-- Grid Layout -->
@@ -247,5 +247,59 @@
 
   <!-- Espaciado para navegación móvil -->
   <div class="h-16 lg:hidden"></div>
+
+  <!-- Script para cargar datos del usuario -->
+  <script>
+    // Cargar datos del usuario desde sessionStorage
+    function loadUserData() {
+      try {
+        const ssoUser = sessionStorage.getItem('sso_user');
+
+        if (ssoUser) {
+          const user = JSON.parse(ssoUser);
+
+          // Actualizar nombre del usuario
+          const userNameEl = document.getElementById('user-name');
+          if (userNameEl && user.nombre) {
+            // Usar solo el primer nombre
+            const firstName = user.nombre.split(' ')[0];
+            userNameEl.textContent = firstName;
+          }
+
+          // Actualizar rol del usuario
+          const userRoleEl = document.getElementById('user-role');
+          if (userRoleEl && user.rol) {
+            userRoleEl.textContent = user.rol;
+          }
+
+          // Actualizar avatar en navegación móvil (inicial del nombre)
+          const avatarEls = document.querySelectorAll('.rounded-full .text-white');
+          avatarEls.forEach(avatar => {
+            if (user.nombre && avatar.textContent === 'M') {
+              const initial = user.nombre.charAt(0).toUpperCase();
+              avatar.textContent = initial;
+            }
+          });
+
+          console.log('✅ Datos de usuario cargados:', {
+            nombre: user.nombre,
+            rol: user.rol,
+            email: user.email
+          });
+        } else {
+          console.warn('⚠️ No hay datos de usuario en sessionStorage');
+        }
+      } catch (error) {
+        console.error('❌ Error cargando datos de usuario:', error);
+      }
+    }
+
+    // Ejecutar al cargar la página
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadUserData);
+    } else {
+      loadUserData();
+    }
+  </script>
 </body>
 </html>
