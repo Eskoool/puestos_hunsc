@@ -9,6 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../assets/css/styles.css"/>
 
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/areas-manager.js"></script>
+
   <style>
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -77,8 +82,8 @@
           <span class="hidden md:block text-lg lg:text-2xl font-bold text-text-light dark:text-text-dark">Asignación de Áreas</span>
         </a>
         <span class="md:hidden text-lg font-bold text-text-light dark:text-text-dark">Asignaciones</span>
-        <a href="perfil.html" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
-          M
+        <a href="perfil.html" id="user-avatar-header" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
+          U
         </a>
           </div>
         </div>
@@ -91,7 +96,7 @@
       <div class="px-4 lg:px-6 py-3">
         <div class="relative">
           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-          <input class="w-full rounded-full border-gray-300/80 bg-white/60 py-2.5 pl-10 pr-4 shadow-sm focus:border-primary focus:ring-primary dark:border-slate-600/80 dark:bg-slate-800/60 dark:text-white dark:placeholder-gray-400 dark:focus:border-accent dark:focus:ring-accent" placeholder="Buscar personal o área..." type="search"/>
+          <input id="search-input" class="w-full rounded-full border-gray-300/80 bg-white/60 py-2.5 pl-10 pr-4 shadow-sm focus:border-primary focus:ring-primary dark:border-slate-600/80 dark:bg-slate-800/60 dark:text-white dark:placeholder-gray-400 dark:focus:border-accent dark:focus:ring-accent" placeholder="Buscar personal o área..." type="search"/>
         </div>
       </div>
 
@@ -99,96 +104,16 @@
       <main class="flex flex-col gap-6 px-4">
         <section>
           <div class="flex items-center justify-between px-1 pb-2 pt-4">
-            <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] text-text-light dark:text-text-dark">Mis Asignaciones de Áreas</h2>
-            <div class="px-3 py-1.5 bg-info/10 rounded-full">
-              <span class="text-xs font-semibold text-info dark:text-cyan-400">Solo lectura</span>
+            <h2 id="section-title" class="text-lg font-bold leading-tight tracking-[-0.015em] text-text-light dark:text-text-dark">Mis Asignaciones de Áreas</h2>
+            <div id="admin-badge" class="px-3 py-1.5 bg-info/10 rounded-full hidden">
+              <span class="text-xs font-semibold text-info dark:text-cyan-400">Administrador</span>
             </div>
           </div>
 
-          <div class="flex flex-col gap-4">
-            <!-- Área: Unidosis -->
-            <div class="flex flex-col gap-3 rounded-lg frosted-glass p-4">
-              <div class="flex items-center justify-between">
-                <h3 class="text-base font-semibold text-secondary dark:text-accent">Unidosis</h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-medium text-gray-600 dark:text-gray-300">4/5</span>
-                  <div class="h-2.5 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div class="h-2.5 rounded-full bg-primary" style="width: 80%"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div class="flex items-center gap-2 rounded-lg bg-white/50 p-2 dark:bg-slate-800/50">
-                  <img class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClAbU252hJ8EY8HBvQLr9HP4rEQVkKjOjksGvwzpXFZFv_J7Fi4_FBcp8susvjYggXf5nYHgdl0OrpthD7X0bcMDdovV_a_HZhMcM-SSyZeS4DT1oxUZJNK-GxNpvfIdoHjviCRgInOTkynsXi2E0UCek0YJoxvAUvP38KfPJVXSxdGu2bD2ev2zkumJ7iyA5Qv2hy7iT3j_7WbjgAXUSP6mmRiIEaECkT1yL433PPM-dXdX9WmqeiYvfK0TPof4Q0EwOxBZaBBWo8"/>
-                  <div>
-                    <p class="truncate text-sm font-medium text-text-light dark:text-text-dark">Laura Gómez</p>
-                    <p class="text-xs text-info dark:text-cyan-400">Actual</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2 rounded-lg bg-white/50 p-2 dark:bg-slate-800/50">
-                  <img class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJlTWLOKzlQyDjPv7m8z1LLO37qU_DGcPsnInzlhVeV4tZFXsgI1MhHBdSRsm31WDUqS3p56KTsc5pQFKF7fulDkC1ZWjnr0lcSdzVzBpHV3VlrnCEiAAQjBwnpYwB1aXlpkwQNddf9CWqBbEAFXX8wHOwxqTLLlvsUoFyjsMqosDw3njJDv-mdO6BKMkyIP_GP3bGOOizzub4HnlZ2k5YAXbLvtSso0yzAk7RN1SljfSKd_wQ2ajcVQSUpfWI7CotCy3sqwNQKzQc"/>
-                  <div>
-                    <p class="truncate text-sm font-medium text-text-light dark:text-text-dark">Carlos Vega</p>
-                    <p class="text-xs text-info dark:text-cyan-400">Actual</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2 rounded-lg bg-white/50 p-2 dark:bg-slate-800/50">
-                  <img class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfZ-zOoaGrxEC7tanoLR1hxBCklMJeZe0BzLuTIZEEVlCQSxyrldew_OeWJdbQ3ahDriLWBuWPY76vH-4OYO0C7RroagGjmOEbzq4wAQui6aahDdPU6MTO8L160kFAoPmMdEr3QaCCWnEDrPQkXOjagX4y9T81qJ1wUg-EoQtqQZv9EeNLt8d_FuKpWx3-xtxyl48auLlBkmP6ZI4AlJ-Sj1Wf1aKNq26eMr1RZQQ0MHrSDgqRdHRNF7omIynucgYW05qs5EwlYV5M"/>
-                  <div>
-                    <p class="truncate text-sm font-medium text-text-light dark:text-text-dark">Juan Rodríguez</p>
-                    <p class="text-xs text-info dark:text-cyan-400">Actual</p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2 rounded-lg bg-white/50 p-2 dark:bg-slate-800/50">
-                  <img class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd1Q5VXYq7nIpozmGr0mzeVktOVbgl9KBIuZsC52TdCm9i-DumrcJyXKryhMTu8HS9BCpioYpB7sFAk5A1vAoAbzt2LSG6qGbJH89aCXSnFNratPC_NNniRzAS56LtZIRhTdTxqiSkaWvr35jal8jsA356aIR2fxVfHjgOhlNX6ZNAwHZSUfz8BW3XM-IKx-BZRtCYOUNErJ3fRFRmqq97JeeOT2HSNIZ20arLPmMqHqvXhkhZYeF398GIzqHefgt2Z3VNSCW9Fqa1"/>
-                  <div>
-                    <p class="truncate text-sm font-medium text-text-light dark:text-text-dark">Sofía Martín</p>
-                    <p class="text-xs text-warning dark:text-orange-400">Futura</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Área: Farmacotecnia -->
-            <div class="flex flex-col gap-3 rounded-lg frosted-glass p-4">
-              <div class="flex items-center justify-between">
-                <h3 class="text-base font-semibold text-text-light dark:text-text-dark">Farmacotecnia</h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-medium text-gray-600 dark:text-gray-300">1/3</span>
-                  <div class="h-2.5 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div class="h-2.5 rounded-full bg-primary" style="width: 33.33%"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div class="flex items-center gap-2 rounded-lg bg-white/50 p-2 dark:bg-slate-800/50">
-                  <img class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvGjdrgt6g0H4WVGpHz1Uajx6zA74YQR-LvmXGc3--EoN1FNRXAidRHAVPE_TlFk3vRq98Nq06BNyY0bZDBogfnnvK43S6PQliKiSkpICnk0ah_ChvbNHet2NhQItP4CUrDJnEsnzMo8V31B3e9K2JLuQxTPs07wspS9rLcUtWk1nRzEo5BnOS7uek4pE9l_4B7H0ETpKQMNrSxRiAqKRCY_ku9vvPKYa031Aj1Xujqa97TLYw1j1vT9w546vMNQWF8Zi79q3qf8NI"/>
-                  <div>
-                    <p class="truncate text-sm font-medium text-text-light dark:text-text-dark">Dra. Ana Pérez</p>
-                    <p class="text-xs text-info dark:text-cyan-400">Actual</p>
-                  </div>
-                </div>
-                <div class="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 text-gray-400 dark:border-gray-600 dark:bg-gray-800/50">
-                  <span class="material-symbols-outlined text-lg">block</span>
-                  <span class="text-sm font-medium">Sin asignar</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Área: Nutrición Parenteral -->
-            <div class="flex flex-col gap-3 rounded-lg frosted-glass p-4">
-              <div class="flex items-center justify-between">
-                <h3 class="text-base font-semibold text-text-light dark:text-text-dark">Nutrición Parenteral</h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-medium text-gray-600 dark:text-gray-300">0/2</span>
-                  <div class="h-2.5 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div class="h-2.5 rounded-full bg-primary" style="width: 0%"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="min-h-[50px] flex items-center justify-center">
-                <p class="text-center text-sm text-gray-500 dark:text-gray-400">No hay personal asignado en esta área</p>
-              </div>
+          <div id="areas-container" class="flex flex-col gap-4">
+            <!-- Se cargarán dinámicamente desde Supabase -->
+            <div class="text-center text-slate-500 dark:text-slate-400 py-8">
+              Cargando asignaciones de áreas...
             </div>
           </div>
         </section>
@@ -216,13 +141,207 @@
           <span class="text-xs font-bold">Asignación</span>
         </a>
         <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="perfil.html">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-sm font-bold">
-            M
+          <div id="user-avatar-nav" class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-sm font-bold">
+            U
           </div>
           <span class="text-xs font-medium">Perfil</span>
         </a>
       </div>
     </nav>
   </div>
+
+  <script>
+    let currentUser = null;
+    let isAdmin = false;
+    let allAssignments = [];
+
+    // Cargar datos del usuario y configurar avatares
+    async function loadUserData() {
+      try {
+        const ssoUser = sessionStorage.getItem('sso_user');
+        if (!ssoUser) {
+          console.warn('No hay usuario en sessionStorage');
+          return;
+        }
+
+        currentUser = JSON.parse(ssoUser);
+        isAdmin = ['administrador', 'admin', 'administrator'].includes(
+          (currentUser.rol || '').toLowerCase()
+        );
+        console.log('✅ Usuario cargado:', currentUser, 'Admin:', isAdmin);
+
+        // Calcular iniciales: Primera letra nombre + Primera letra primer apellido
+        let initials = 'U';
+        if (currentUser.nombre) {
+          const nameParts = currentUser.nombre.trim().split(' ');
+          if (nameParts.length >= 2) {
+            initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+          } else if (nameParts.length === 1) {
+            initials = nameParts[0].charAt(0).toUpperCase();
+          }
+        }
+
+        // Actualizar todos los avatares
+        const avatarHeader = document.getElementById('user-avatar-header');
+        const avatarNav = document.getElementById('user-avatar-nav');
+        if (avatarHeader) avatarHeader.textContent = initials;
+        if (avatarNav) avatarNav.textContent = initials;
+
+        // Actualizar título si es admin
+        if (isAdmin) {
+          document.getElementById('section-title').textContent = 'Todas las Asignaciones de Áreas';
+          document.getElementById('admin-badge').classList.remove('hidden');
+        }
+
+      } catch (error) {
+        console.error('❌ Error cargando datos del usuario:', error);
+      }
+    }
+
+    // Inicializar página
+    async function initPage() {
+      await loadUserData();
+
+      // Esperar a que Supabase esté listo
+      if (typeof window.supabaseClient === 'undefined') {
+        console.log('⏳ Esperando a que Supabase se inicialice...');
+        let attempts = 0;
+        while (typeof window.supabaseClient === 'undefined' && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+      }
+
+      // Inicializar areas manager
+      if (window.areasManager) {
+        try {
+          await window.areasManager.init();
+          await loadAreas();
+        } catch (error) {
+          console.error('❌ Error inicializando areas manager:', error);
+        }
+      }
+
+      // Configurar búsqueda
+      document.getElementById('search-input').addEventListener('input', handleSearch);
+    }
+
+    // Cargar áreas
+    async function loadAreas() {
+      try {
+        // Cargar asignaciones
+        allAssignments = await window.areasManager.getAllAreaAssignments();
+        console.log('✅ Asignaciones cargadas:', allAssignments);
+
+        renderAreas(allAssignments);
+
+      } catch (error) {
+        console.error('❌ Error cargando áreas:', error);
+        document.getElementById('areas-container').innerHTML = '<div class="text-center text-red-500 py-8">Error cargando asignaciones de áreas</div>';
+      }
+    }
+
+    // Renderizar áreas
+    function renderAreas(assignments) {
+      const container = document.getElementById('areas-container');
+
+      if (!assignments || assignments.length === 0) {
+        container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 py-8">No hay asignaciones de áreas registradas</div>';
+        return;
+      }
+
+      // Agrupar por área
+      const areaMap = {};
+      assignments.forEach(assignment => {
+        const areaName = assignment.pharmacy_area || 'Sin área';
+        if (!areaMap[areaName]) {
+          areaMap[areaName] = [];
+        }
+        areaMap[areaName].push(assignment);
+      });
+
+      // Renderizar cada área
+      const areasHTML = Object.keys(areaMap).sort().map(areaName => {
+        const areaAssignments = areaMap[areaName];
+        const activeCount = areaAssignments.filter(a => a.is_active).length;
+        const totalCount = areaAssignments.length;
+        const percentage = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
+
+        const assignmentsHTML = areaAssignments.map(assignment => {
+          const user = assignment.user;
+          if (!user) return '';
+
+          // Calcular iniciales del usuario
+          let userInitials = 'U';
+          if (user.nombre) {
+            const nameParts = user.nombre.trim().split(' ');
+            if (nameParts.length >= 2) {
+              userInitials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+            } else if (nameParts.length === 1) {
+              userInitials = nameParts[0].charAt(0).toUpperCase();
+            }
+          }
+
+          const statusLabel = assignment.is_active ? 'Actual' : 'Inactivo';
+          const statusClass = assignment.is_active ? 'text-info dark:text-cyan-400' : 'text-gray-500 dark:text-gray-400';
+
+          return `
+            <div class="flex items-center gap-2 rounded-lg bg-white/50 p-2 dark:bg-slate-800/50">
+              <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-bold">
+                ${userInitials}
+              </div>
+              <div>
+                <p class="truncate text-sm font-medium text-text-light dark:text-text-dark">${user.nombre}</p>
+                <p class="text-xs ${statusClass}">${statusLabel}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="flex flex-col gap-3 rounded-lg frosted-glass p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold text-secondary dark:text-accent">${areaName}</h3>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-300">${activeCount}/${totalCount}</span>
+                <div class="h-2.5 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div class="h-2.5 rounded-full bg-primary" style="width: ${percentage}%"></div>
+                </div>
+              </div>
+            </div>
+            ${assignmentsHTML ? `<div class="grid grid-cols-2 gap-3">${assignmentsHTML}</div>` : '<div class="min-h-[50px] flex items-center justify-center"><p class="text-center text-sm text-gray-500 dark:text-gray-400">No hay personal asignado en esta área</p></div>'}
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = areasHTML || '<div class="text-center text-slate-500 dark:text-slate-400 py-8">No hay áreas configuradas</div>';
+    }
+
+    // Manejar búsqueda
+    function handleSearch(e) {
+      const searchTerm = e.target.value.toLowerCase().trim();
+
+      if (!searchTerm) {
+        renderAreas(allAssignments);
+        return;
+      }
+
+      // Filtrar asignaciones que coincidan con el término de búsqueda
+      const filtered = allAssignments.filter(assignment => {
+        const areaMatch = (assignment.pharmacy_area || '').toLowerCase().includes(searchTerm);
+        const userMatch = (assignment.user?.nombre || '').toLowerCase().includes(searchTerm);
+        return areaMatch || userMatch;
+      });
+
+      renderAreas(filtered);
+    }
+
+    // Inicializar página cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  </script>
 </body>
 </html>
