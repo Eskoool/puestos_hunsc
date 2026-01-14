@@ -194,10 +194,16 @@
               Mi Guardia
             </span>
           </div>
-          <button onclick="openSwapModal()" class="px-4 py-2 bg-secondary text-white rounded-full font-semibold text-sm hover:bg-secondary/90 flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">swap_horiz</span>
-            Registrar Cambio
-          </button>
+          <div class="flex gap-2">
+            <button id="btn-new-guard" onclick="openNewGuardModal()" class="px-4 py-2 bg-primary text-white rounded-full font-semibold text-sm hover:bg-primary/90 flex items-center gap-2 hidden">
+              <span class="material-symbols-outlined text-sm">add</span>
+              Nueva Guardia
+            </button>
+            <button onclick="openSwapModal()" class="px-4 py-2 bg-secondary text-white rounded-full font-semibold text-sm hover:bg-secondary/90 flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">swap_horiz</span>
+              Registrar Cambio
+            </button>
+          </div>
         </div>
       </div>
 
@@ -207,7 +213,7 @@
           <button onclick="changeMonth(-1)" class="p-2 hover:bg-gray-100 rounded-lg">
             <span class="material-symbols-outlined">chevron_left</span>
           </button>
-          <h2 id="calendar-month" class="text-xl md:text-2xl font-bold text-gray-900">Diciembre 2024</h2>
+          <h2 id="calendar-month" class="text-xl md:text-2xl font-bold text-gray-900">Cargando mes...</h2>
           <button onclick="changeMonth(1)" class="p-2 hover:bg-gray-100 rounded-lg">
             <span class="material-symbols-outlined">chevron_right</span>
           </button>
@@ -371,6 +377,68 @@
     </div>
   </div>
 
+  <!-- Modal Nueva Guardia (Solo Admin) -->
+  <div id="newGuardModal" class="modal">
+    <div class="modal-content">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold text-gray-900">Nueva Guardia</h3>
+        <button onclick="closeNewGuardModal()" class="p-2 hover:bg-gray-100 rounded-full">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="newGuardForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha de la Guardia *</label>
+          <input type="date" id="newGuardDate" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary"/>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Farmacéutico Principal (Turno Mañana)</label>
+          <select id="newPharmacist1" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+            <option value="">Sin asignar</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Farmacéutico de Apoyo (Turno Tarde)</label>
+          <select id="newPharmacist2" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+            <option value="">Sin asignar</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">FIR Asignado</label>
+          <select id="newFir" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+            <option value="">Sin asignar</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Estado</label>
+          <select id="newStatus" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary">
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmada">Confirmada</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Notas (opcional)</label>
+          <textarea id="newNotes" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary" placeholder="Notas adicionales sobre esta guardia..."></textarea>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeNewGuardModal()" class="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90">
+            Crear Guardia
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
@@ -411,6 +479,15 @@
         // Cargar usuarios disponibles
         allUsers = await window.guardiasManager.getAvailableUsers();
         console.log(`✅ ${allUsers.length} usuarios disponibles cargados`);
+
+        // Mostrar botón "Nueva Guardia" solo para administradores
+        const isAdmin = ['administrador', 'admin', 'administrator'].includes(
+          (currentUserRole || '').toLowerCase()
+        );
+        if (isAdmin) {
+          document.getElementById('btn-new-guard').classList.remove('hidden');
+          console.log('✅ Usuario es administrador - Botón "Nueva Guardia" habilitado');
+        }
 
         // Cargar guardias del mes actual
         await loadShiftsForMonth(currentYear, currentMonth);
@@ -736,6 +813,76 @@
       document.getElementById('user2').disabled = true;
       document.getElementById('shift1').disabled = true;
       document.getElementById('shift2').disabled = true;
+    });
+
+    // Funciones del modal de Nueva Guardia
+    function openNewGuardModal() {
+      // Cargar usuarios en los selectores
+      loadUsersForNewGuard();
+      document.getElementById('newGuardModal').classList.add('active');
+    }
+
+    function closeNewGuardModal() {
+      document.getElementById('newGuardModal').classList.remove('active');
+      document.getElementById('newGuardForm').reset();
+    }
+
+    async function loadUsersForNewGuard() {
+      try {
+        const users = await window.guardiasManager.getAvailableUsers();
+
+        const pharmacist1Select = document.getElementById('newPharmacist1');
+        const pharmacist2Select = document.getElementById('newPharmacist2');
+        const firSelect = document.getElementById('newFir');
+
+        // Limpiar selects
+        pharmacist1Select.innerHTML = '<option value="">Sin asignar</option>';
+        pharmacist2Select.innerHTML = '<option value="">Sin asignar</option>';
+        firSelect.innerHTML = '<option value="">Sin asignar</option>';
+
+        // Llenar selects
+        users.forEach(user => {
+          const option = `<option value="${user.id}">${user.nombre} (${user.rol})</option>`;
+
+          if (user.rol && user.rol.toLowerCase().includes('fir')) {
+            firSelect.innerHTML += option;
+          } else {
+            pharmacist1Select.innerHTML += option;
+            pharmacist2Select.innerHTML += option;
+          }
+        });
+      } catch (error) {
+        console.error('❌ Error cargando usuarios:', error);
+      }
+    }
+
+    // Manejar envío del formulario de nueva guardia
+    document.getElementById('newGuardForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      try {
+        const guardData = {
+          guard_date: document.getElementById('newGuardDate').value,
+          pharmacist_1_id: document.getElementById('newPharmacist1').value || null,
+          pharmacist_2_id: document.getElementById('newPharmacist2').value || null,
+          fir_id: document.getElementById('newFir').value || null,
+          status: document.getElementById('newStatus').value,
+          notes: document.getElementById('newNotes').value || null
+        };
+
+        await window.guardiasManager.createGuard(guardData);
+
+        alert('✅ Guardia creada correctamente');
+        closeNewGuardModal();
+
+        // Recargar guardias del mes
+        await loadShiftsForMonth(currentYear, currentMonth);
+        renderCalendar();
+
+      } catch (error) {
+        console.error('❌ Error creando guardia:', error);
+        alert('Error al crear la guardia: ' + error.message);
+      }
     });
 
     // Inicializar página al cargar
