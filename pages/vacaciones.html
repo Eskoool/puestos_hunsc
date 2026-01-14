@@ -9,6 +9,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../assets/css/styles.css"/>
 
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/vacaciones-manager.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -118,8 +123,8 @@
             <span class="hidden md:block text-lg lg:text-2xl font-bold text-slate-900 dark:text-white">Solicitar Vacaciones</span>
           </a>
           <span class="md:hidden text-lg font-bold text-slate-900 dark:text-white">Vacaciones</span>
-          <a href="perfil.html" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
-            M
+          <a href="perfil.html" id="user-avatar-header" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
+            U
           </a>
         </div>
       </div>
@@ -136,8 +141,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs text-slate-600 dark:text-slate-400">Vacaciones Anuales</p>
-              <p class="text-2xl font-bold text-primary">22 días</p>
-              <p class="text-xs text-slate-500 mt-1">de 30 totales</p>
+              <p class="text-2xl font-bold text-primary" id="vacation-available">-- días</p>
+              <p class="text-xs text-slate-500 mt-1">de <span id="vacation-total">--</span> totales</p>
             </div>
             <span class="material-symbols-outlined text-4xl text-primary/30">beach_access</span>
           </div>
@@ -147,8 +152,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs text-slate-600 dark:text-slate-400">Asuntos Propios</p>
-              <p class="text-2xl font-bold text-secondary">3 días</p>
-              <p class="text-xs text-slate-500 mt-1">de 5 totales</p>
+              <p class="text-2xl font-bold text-secondary" id="personal-available">-- días</p>
+              <p class="text-xs text-slate-500 mt-1">de <span id="personal-total">--</span> totales</p>
             </div>
             <span class="material-symbols-outlined text-4xl text-secondary/30">event_note</span>
           </div>
@@ -158,8 +163,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs text-slate-600 dark:text-slate-400">Días Libres</p>
-              <p class="text-2xl font-bold text-green-600">2 días</p>
-              <p class="text-xs text-slate-500 mt-1">de 2 totales</p>
+              <p class="text-2xl font-bold text-green-600" id="free-available">-- días</p>
+              <p class="text-xs text-slate-500 mt-1">de <span id="free-total">--</span> totales</p>
             </div>
             <span class="material-symbols-outlined text-4xl text-green-600/30">free_cancellation</span>
           </div>
@@ -187,9 +192,9 @@
       <div class="px-4 py-2">
         <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Tipo de Solicitud</label>
         <select id="vacation-type" class="form-select w-full rounded-full border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-primary">
-          <option value="anuales">Vacaciones Anuales (22 días disponibles)</option>
-          <option value="asuntos">Asuntos Propios (3 días disponibles)</option>
-          <option value="libres">Días Libres (2 días disponibles)</option>
+          <option value="anuales">Vacaciones Anuales (-- días disponibles)</option>
+          <option value="asuntos">Asuntos Propios (-- días disponibles)</option>
+          <option value="libres">Días Libres (-- días disponibles)</option>
         </select>
       </div>
 
@@ -254,56 +259,10 @@
     <div id="view-historial" class="hidden">
       <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Historial de Solicitudes</h2>
 
-      <div class="flex flex-col gap-4 px-4 pb-8">
-        <!-- Solicitud Aprobada -->
-        <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-sm font-medium text-primary">Vacaciones Anuales</p>
-              <p class="text-sm text-slate-600 dark:text-slate-400">12/11/2024 - 18/11/2024</p>
-              <p class="text-lg font-bold text-slate-800 dark:text-slate-100">7 días</p>
-            </div>
-            <div class="flex items-center gap-2 rounded-full bg-status-approved/10 px-3 py-1 text-sm font-medium text-status-approved dark:text-primary">
-              <span class="material-symbols-outlined text-base">check_circle</span>
-              <span>Aprobado</span>
-            </div>
-          </div>
-          <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> Viaje familiar programado.</p>
-        </div>
-
-        <!-- Solicitud Pendiente -->
-        <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-sm font-medium text-secondary">Asuntos Propios</p>
-              <p class="text-sm text-slate-600 dark:text-slate-400">20/12/2024 - 21/12/2024</p>
-              <p class="text-lg font-bold text-slate-800 dark:text-slate-100">2 días</p>
-            </div>
-            <div class="flex items-center gap-2 rounded-full bg-status-pending/10 px-3 py-1 text-sm font-medium text-status-pending dark:text-secondary">
-              <span class="material-symbols-outlined text-base">hourglass_top</span>
-              <span>Pendiente</span>
-            </div>
-          </div>
-          <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> Asunto personal urgente.</p>
-          <div class="flex gap-3 pt-2">
-            <button class="flex-1 rounded-full h-10 bg-red-500 text-white font-semibold text-sm hover:bg-red-600">Cancelar Solicitud</button>
-          </div>
-        </div>
-
-        <!-- Solicitud Rechazada -->
-        <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-sm font-medium text-primary">Vacaciones Anuales</p>
-              <p class="text-sm text-slate-600 dark:text-slate-400">01/10/2024 - 03/10/2024</p>
-              <p class="text-lg font-bold text-slate-800 dark:text-slate-100">3 días</p>
-            </div>
-            <div class="flex items-center gap-2 rounded-full bg-status-rejected/10 px-3 py-1 text-sm font-medium text-status-rejected dark:text-status-rejected/80">
-              <span class="material-symbols-outlined text-base">cancel</span>
-              <span>Rechazado</span>
-            </div>
-          </div>
-          <p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo denegación:</strong> Falta de cobertura en esas fechas.</p>
+      <div id="requests-container" class="flex flex-col gap-4 px-4 pb-8">
+        <!-- Se cargarán dinámicamente desde Supabase -->
+        <div class="text-center text-slate-500 dark:text-slate-400 py-8">
+          Cargando solicitudes...
         </div>
       </div>
     </div>
@@ -330,8 +289,8 @@
           <span class="text-xs font-medium">Áreas</span>
         </a>
         <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="perfil.html">
-          <div class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white text-sm font-bold">
-            M
+          <div id="user-avatar-nav" class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white text-sm font-bold">
+            U
           </div>
           <span class="text-xs font-medium">Perfil</span>
         </a>
@@ -340,10 +299,210 @@
   </div>
 
   <script>
-    let currentMonth = 11; // Diciembre (0-indexed)
-    let currentYear = 2024;
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
     let selectedDays = [];
     let selectionStart = null;
+    let availableDays = {};
+    let currentUser = null;
+
+    // Cargar datos del usuario y configurar avatares
+    async function loadUserData() {
+      try {
+        const ssoUser = sessionStorage.getItem('sso_user');
+        if (!ssoUser) {
+          console.warn('No hay usuario en sessionStorage');
+          return;
+        }
+
+        currentUser = JSON.parse(ssoUser);
+        console.log('✅ Usuario cargado:', currentUser);
+
+        // Calcular iniciales: Primera letra nombre + Primera letra primer apellido
+        let initials = 'U';
+        if (currentUser.nombre) {
+          const nameParts = currentUser.nombre.trim().split(' ');
+          if (nameParts.length >= 2) {
+            initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+          } else if (nameParts.length === 1) {
+            initials = nameParts[0].charAt(0).toUpperCase();
+          }
+        }
+
+        // Actualizar todos los avatares
+        const avatarHeader = document.getElementById('user-avatar-header');
+        const avatarNav = document.getElementById('user-avatar-nav');
+        if (avatarHeader) avatarHeader.textContent = initials;
+        if (avatarNav) avatarNav.textContent = initials;
+
+      } catch (error) {
+        console.error('❌ Error cargando datos del usuario:', error);
+      }
+    }
+
+    // Inicializar vacaciones manager y cargar datos
+    async function initPage() {
+      await loadUserData();
+
+      // Esperar a que Supabase esté listo
+      if (typeof window.supabaseClient === 'undefined') {
+        console.log('⏳ Esperando a que Supabase se inicialice...');
+        let attempts = 0;
+        while (typeof window.supabaseClient === 'undefined' && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+      }
+
+      // Inicializar vacaciones manager
+      if (window.vacacionesManager) {
+        try {
+          await window.vacacionesManager.init();
+          await loadAvailableDays();
+          await loadRequestHistory();
+        } catch (error) {
+          console.error('❌ Error inicializando vacaciones manager:', error);
+        }
+      }
+
+      renderCalendar();
+    }
+
+    // Cargar días disponibles
+    async function loadAvailableDays() {
+      try {
+        availableDays = await window.vacacionesManager.getAvailableDays();
+        console.log('✅ Días disponibles:', availableDays);
+
+        // Actualizar UI
+        document.getElementById('vacation-available').textContent = `${availableDays.vacation_available} días`;
+        document.getElementById('vacation-total').textContent = availableDays.vacation_total;
+
+        document.getElementById('personal-available').textContent = `${availableDays.personal_available} días`;
+        document.getElementById('personal-total').textContent = availableDays.personal_total;
+
+        document.getElementById('free-available').textContent = `${availableDays.free_available} días`;
+        document.getElementById('free-total').textContent = availableDays.free_total;
+
+        // Actualizar opciones del select
+        const vacationType = document.getElementById('vacation-type');
+        vacationType.options[0].text = `Vacaciones Anuales (${availableDays.vacation_available} días disponibles)`;
+        vacationType.options[1].text = `Asuntos Propios (${availableDays.personal_available} días disponibles)`;
+        vacationType.options[2].text = `Días Libres (${availableDays.free_available} días disponibles)`;
+
+      } catch (error) {
+        console.error('❌ Error cargando días disponibles:', error);
+      }
+    }
+
+    // Cargar historial de solicitudes
+    async function loadRequestHistory() {
+      try {
+        const requests = await window.vacacionesManager.getMyRequests();
+        console.log('✅ Solicitudes cargadas:', requests);
+
+        const container = document.getElementById('requests-container');
+
+        if (!requests || requests.length === 0) {
+          container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 py-8">No tienes solicitudes registradas</div>';
+          return;
+        }
+
+        container.innerHTML = requests.map(request => {
+          const statusConfig = {
+            aprobada: {
+              color: 'status-approved',
+              icon: 'check_circle',
+              label: 'Aprobado',
+              bgClass: 'bg-status-approved/10 text-status-approved dark:text-primary'
+            },
+            pendiente: {
+              color: 'status-pending',
+              icon: 'hourglass_top',
+              label: 'Pendiente',
+              bgClass: 'bg-status-pending/10 text-status-pending dark:text-secondary'
+            },
+            rechazada: {
+              color: 'status-rejected',
+              icon: 'cancel',
+              label: 'Rechazado',
+              bgClass: 'bg-status-rejected/10 text-status-rejected dark:text-status-rejected/80'
+            }
+          };
+
+          const status = statusConfig[request.status] || statusConfig.pendiente;
+          const typeLabel = {
+            anuales: 'Vacaciones Anuales',
+            asuntos: 'Asuntos Propios',
+            libres: 'Días Libres'
+          }[request.request_type] || request.request_type;
+
+          const startDate = formatDate(request.start_date);
+          const endDate = formatDate(request.end_date);
+
+          // Calcular días
+          const start = new Date(request.start_date);
+          const end = new Date(request.end_date);
+          const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+          let actionButtons = '';
+          if (request.status === 'pendiente') {
+            actionButtons = `
+              <div class="flex gap-3 pt-2">
+                <button onclick="cancelRequest('${request.id}')" class="flex-1 rounded-full h-10 bg-red-500 text-white font-semibold text-sm hover:bg-red-600">
+                  Cancelar Solicitud
+                </button>
+              </div>
+            `;
+          }
+
+          let rejectionReason = '';
+          if (request.status === 'rechazada' && request.rejection_reason) {
+            rejectionReason = `<p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo denegación:</strong> ${request.rejection_reason}</p>`;
+          }
+
+          return `
+            <div class="glass-card iridescent-border vacaciones-border rounded-lg p-4 flex flex-col gap-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium text-primary">${typeLabel}</p>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">${startDate} - ${endDate}</p>
+                  <p class="text-lg font-bold text-slate-800 dark:text-slate-100">${days} día${days !== 1 ? 's' : ''}</p>
+                </div>
+                <div class="flex items-center gap-2 rounded-full ${status.bgClass} px-3 py-1 text-sm font-medium">
+                  <span class="material-symbols-outlined text-base">${status.icon}</span>
+                  <span>${status.label}</span>
+                </div>
+              </div>
+              ${request.reason ? `<p class="text-sm text-slate-600 dark:text-slate-400"><strong>Motivo:</strong> ${request.reason}</p>` : ''}
+              ${rejectionReason}
+              ${actionButtons}
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('❌ Error cargando historial:', error);
+        document.getElementById('requests-container').innerHTML = '<div class="text-center text-red-500 py-8">Error cargando solicitudes</div>';
+      }
+    }
+
+    // Cancelar solicitud
+    async function cancelRequest(requestId) {
+      if (!confirm('¿Estás seguro de que quieres cancelar esta solicitud?')) {
+        return;
+      }
+
+      try {
+        await window.vacacionesManager.cancelRequest(requestId);
+        alert('Solicitud cancelada correctamente');
+        await loadRequestHistory();
+        await loadAvailableDays();
+      } catch (error) {
+        console.error('❌ Error cancelando solicitud:', error);
+        alert('Error al cancelar la solicitud');
+      }
+    }
 
     function toggleView(view) {
       if (view === 'solicitar') {
@@ -363,7 +522,7 @@
 
       const firstDay = new Date(currentYear, currentMonth, 1).getDay();
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1; // Adjust for Monday start
+      const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
 
       let html = '';
 
@@ -409,13 +568,10 @@
 
     function selectDay(dateStr) {
       if (selectionStart === null) {
-        // Start new selection
         selectionStart = dateStr;
         selectedDays = [dateStr];
       } else {
-        // Complete range or deselect
         if (selectedDays.includes(dateStr)) {
-          // Deselect - clear everything
           clearSelection();
           return;
         }
@@ -424,11 +580,9 @@
         const end = new Date(dateStr);
 
         if (end < start) {
-          // Swap if end is before start
           selectionStart = dateStr;
           selectedDays = [dateStr];
         } else {
-          // Fill range
           selectedDays = [];
           const current = new Date(start);
           while (current <= end) {
@@ -455,7 +609,7 @@
     }
 
     function formatDate(dateStr) {
-      const date = new Date(dateStr);
+      const date = new Date(dateStr + 'T00:00:00');
       const day = String(date.getDate()).padStart(2, '0');
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const year = date.getFullYear();
@@ -481,24 +635,65 @@
       renderCalendar();
     }
 
-    function submitRequest() {
+    async function submitRequest() {
       if (selectedDays.length === 0) {
         alert('Por favor selecciona al menos un día');
         return;
       }
 
-      const type = document.getElementById('vacation-type').options[document.getElementById('vacation-type').selectedIndex].text;
+      const typeSelect = document.getElementById('vacation-type');
+      const requestType = typeSelect.value;
       const comments = document.getElementById('comments').value;
 
-      alert(`Solicitud enviada:\n\nTipo: ${type}\nDías: ${selectedDays.length}\nDesde: ${formatDate(selectedDays[0])}\nHasta: ${formatDate(selectedDays[selectedDays.length - 1])}\nMotivo: ${comments || 'Sin comentarios'}`);
+      // Verificar días disponibles
+      const daysNeeded = selectedDays.length;
+      let available = 0;
 
-      // Reset
-      clearSelection();
-      document.getElementById('comments').value = '';
+      if (requestType === 'anuales') {
+        available = availableDays.vacation_available;
+      } else if (requestType === 'asuntos') {
+        available = availableDays.personal_available;
+      } else if (requestType === 'libres') {
+        available = availableDays.free_available;
+      }
+
+      if (daysNeeded > available) {
+        alert(`No tienes suficientes días disponibles. Necesitas ${daysNeeded} días pero solo tienes ${available} disponibles.`);
+        return;
+      }
+
+      try {
+        const requestData = {
+          request_type: requestType,
+          start_date: selectedDays[0],
+          end_date: selectedDays[selectedDays.length - 1],
+          reason: comments || null
+        };
+
+        await window.vacacionesManager.createRequest(requestData);
+
+        alert('✅ Solicitud enviada correctamente');
+
+        // Limpiar formulario
+        clearSelection();
+        document.getElementById('comments').value = '';
+
+        // Recargar datos
+        await loadAvailableDays();
+        await loadRequestHistory();
+
+      } catch (error) {
+        console.error('❌ Error enviando solicitud:', error);
+        alert('Error al enviar la solicitud. Por favor intenta de nuevo.');
+      }
     }
 
-    // Initialize calendar
-    renderCalendar();
+    // Inicializar página cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
   </script>
 </body>
 </html>
