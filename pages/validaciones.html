@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Validaciones de Plantas - Farmacia HUNSC Sur</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/styles.css"/>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/validaciones-manager.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#5A0E6E",
+            "secondary": "#AF9100",
+            "tertiary": "#D4AF37",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101c22",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "1rem",
+            "lg": "1.5rem",
+            "xl": "2rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    .glass-card {
+      background-color: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glass-card {
+      background-color: rgba(26, 38, 47, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
+  <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+
+    <!-- Header -->
+    <div class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+      <div class="mx-auto max-w-7xl">
+        <div class="flex items-center p-4 lg:p-6 pb-2 justify-between">
+          <a href="../index.html" class="flex items-center gap-4">
+            <img class="h-10 lg:h-12" src="https://lh3.googleusercontent.com/d/1S6INg4SoWOJsoccSDnmP92EKK3GwWeTY"/>
+            <span class="hidden md:block text-lg lg:text-2xl font-bold text-slate-900 dark:text-white">Validaciones de Plantas</span>
+          </a>
+          <span class="md:hidden text-lg font-bold text-slate-900 dark:text-white">Validaciones</span>
+          <a href="perfil.html" id="user-avatar-header" class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white font-bold cursor-pointer hover:opacity-90 transition-opacity" title="Mi Perfil">
+            U
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor principal con max-width -->
+    <div class="mx-auto w-full max-w-7xl flex-1 pb-20 lg:pb-8">
+
+    <!-- Estadísticas -->
+    <div class="px-4 py-4">
+      <h2 class="text-slate-900 dark:text-white text-lg font-bold mb-3">Resumen de Validaciones</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Pendientes</p>
+              <p class="text-2xl font-bold text-secondary" id="stats-pendiente">--</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-secondary/30">pending_actions</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">En Progreso</p>
+              <p class="text-2xl font-bold text-blue-600" id="stats-en_progreso">--</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-blue-600/30">autorenew</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Completadas</p>
+              <p class="text-2xl font-bold text-green-600" id="stats-completado">--</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-green-600/30">check_circle</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle de vistas -->
+    <div class="flex px-4 py-3">
+      <div class="flex h-12 flex-1 items-center justify-center rounded-full bg-slate-200 dark:bg-background-dark/80 p-1 shadow-inner">
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Pendientes</span>
+          <input checked class="invisible w-0" name="view-toggle" type="radio" value="pendientes" onchange="toggleView('pendientes')"/>
+        </label>
+        <label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-slate-700 has-[:checked]:shadow-md has-[:checked]:text-primary text-slate-600 dark:text-slate-400 dark:has-[:checked]:text-primary text-sm font-medium leading-normal transition-all duration-300">
+          <span class="truncate">Historial</span>
+          <input class="invisible w-0" name="view-toggle" type="radio" value="historial" onchange="toggleView('historial')"/>
+        </label>
+      </div>
+    </div>
+
+    <!-- Vista: Pendientes -->
+    <div id="view-pendientes">
+      <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-2">Validaciones Pendientes</h2>
+
+      <div id="pending-container" class="flex flex-col gap-4 px-4 pb-8">
+        <div class="text-center text-slate-500 dark:text-slate-400 py-8">
+          Cargando validaciones pendientes...
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista: Historial -->
+    <div id="view-historial" class="hidden">
+      <h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-2">Historial de Validaciones</h2>
+
+      <div id="history-container" class="flex flex-col gap-4 px-4 pb-8">
+        <div class="text-center text-slate-500 dark:text-slate-400 py-8">
+          Cargando historial...
+        </div>
+      </div>
+    </div>
+
+    </div><!-- Cierre contenedor max-w-7xl -->
+
+    <!-- Navegación inferior (solo móvil) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 z-20 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700">
+      <div class="mx-auto flex h-20 max-w-md items-center justify-around px-4">
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="../index.html">
+          <span class="material-symbols-outlined">home</span>
+          <span class="text-xs font-medium">Inicio</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="vacaciones.html">
+          <span class="material-symbols-outlined">event</span>
+          <span class="text-xs font-medium">Vacaciones</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="guardias.html">
+          <span class="material-symbols-outlined">calendar_month</span>
+          <span class="text-xs font-medium">Guardias</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-primary dark:text-primary" href="validaciones.html">
+          <span class="material-symbols-outlined">fact_check</span>
+          <span class="text-xs font-bold">Validaciones</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400" href="perfil.html">
+          <div id="user-avatar-nav" class="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-purple-700 flex items-center justify-center text-white text-sm font-bold">
+            U
+          </div>
+          <span class="text-xs font-medium">Perfil</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let isAdmin = false;
+
+    // Cargar datos del usuario
+    async function loadUserData() {
+      try {
+        const ssoUser = sessionStorage.getItem('sso_user');
+        if (!ssoUser) {
+          console.warn('No hay usuario en sessionStorage');
+          return;
+        }
+
+        currentUser = JSON.parse(ssoUser);
+        isAdmin = ['administrador', 'admin', 'administrator'].includes(
+          (currentUser.rol || '').toLowerCase()
+        );
+        console.log('✅ Usuario cargado:', currentUser, 'Admin:', isAdmin);
+
+        // Calcular iniciales
+        let initials = 'U';
+        if (currentUser.nombre) {
+          const nameParts = currentUser.nombre.trim().split(' ');
+          if (nameParts.length >= 2) {
+            initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+          } else if (nameParts.length === 1) {
+            initials = nameParts[0].charAt(0).toUpperCase();
+          }
+        }
+
+        // Actualizar avatares
+        document.getElementById('user-avatar-header').textContent = initials;
+        document.getElementById('user-avatar-nav').textContent = initials;
+
+      } catch (error) {
+        console.error('❌ Error cargando datos del usuario:', error);
+      }
+    }
+
+    // Inicializar página
+    async function initPage() {
+      await loadUserData();
+
+      // Esperar Supabase
+      if (typeof window.supabaseClient === 'undefined') {
+        console.log('⏳ Esperando a que Supabase se inicialice...');
+        let attempts = 0;
+        while (typeof window.supabaseClient === 'undefined' && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+      }
+
+      // Inicializar validaciones manager
+      if (window.validacionesManager) {
+        try {
+          await window.validacionesManager.init();
+          await loadStats();
+          await loadPendingValidations();
+          await loadHistoryValidations();
+        } catch (error) {
+          console.error('❌ Error inicializando validaciones manager:', error);
+        }
+      }
+    }
+
+    // Cargar estadísticas
+    async function loadStats() {
+      try {
+        const stats = await window.validacionesManager.getStats();
+        console.log('✅ Estadísticas cargadas:', stats);
+
+        document.getElementById('stats-pendiente').textContent = stats.pendiente || 0;
+        document.getElementById('stats-en_progreso').textContent = stats.en_progreso || 0;
+        document.getElementById('stats-completado').textContent = stats.completado || 0;
+
+      } catch (error) {
+        console.error('❌ Error cargando estadísticas:', error);
+      }
+    }
+
+    // Cargar validaciones pendientes
+    async function loadPendingValidations() {
+      try {
+        const validations = await window.validacionesManager.getPendingValidations();
+        console.log('✅ Validaciones pendientes cargadas:', validations);
+
+        renderValidations(validations, 'pending-container', true);
+
+      } catch (error) {
+        console.error('❌ Error cargando validaciones pendientes:', error);
+        document.getElementById('pending-container').innerHTML = '<div class="text-center text-red-500 py-8">Error cargando validaciones</div>';
+      }
+    }
+
+    // Cargar historial
+    async function loadHistoryValidations() {
+      try {
+        const validations = isAdmin
+          ? await window.validacionesManager.getAllValidations()
+          : await window.validacionesManager.getMyValidations();
+
+        console.log('✅ Historial cargado:', validations);
+
+        // Filtrar completadas y en progreso
+        const history = validations.filter(v => v.status === 'completado' || v.status === 'en_progreso');
+
+        renderValidations(history, 'history-container', false);
+
+      } catch (error) {
+        console.error('❌ Error cargando historial:', error);
+        document.getElementById('history-container').innerHTML = '<div class="text-center text-red-500 py-8">Error cargando historial</div>';
+      }
+    }
+
+    // Renderizar validaciones
+    function renderValidations(validations, containerId, showActions) {
+      const container = document.getElementById(containerId);
+
+      if (!validations || validations.length === 0) {
+        container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 py-8">No hay validaciones</div>';
+        return;
+      }
+
+      const html = validations.map(validation => {
+        const statusConfig = {
+          pendiente: {
+            color: 'secondary',
+            icon: 'pending_actions',
+            label: 'Pendiente',
+            bgClass: 'bg-secondary/10 text-secondary'
+          },
+          en_progreso: {
+            color: 'blue-600',
+            icon: 'autorenew',
+            label: 'En Progreso',
+            bgClass: 'bg-blue-600/10 text-blue-600'
+          },
+          completado: {
+            color: 'green-600',
+            icon: 'check_circle',
+            label: 'Completado',
+            bgClass: 'bg-green-600/10 text-green-600'
+          }
+        };
+
+        const status = statusConfig[validation.status] || statusConfig.pendiente;
+
+        const startDate = validation.start_date ? formatDate(validation.start_date) : 'Sin fecha';
+        const endDate = validation.end_date ? formatDate(validation.end_date) : 'Sin límite';
+
+        const typeLabel = {
+          'diaria': 'Validación Diaria',
+          'semanal': 'Validación Semanal',
+          'mensual': 'Validación Mensual',
+          'especial': 'Validación Especial'
+        }[validation.assignment_type] || validation.assignment_type || 'Sin tipo';
+
+        let actionButtons = '';
+        if (showActions && validation.status === 'pendiente') {
+          actionButtons = `
+            <div class="flex gap-2 pt-2">
+              <button onclick="startValidation('${validation.id}')" class="flex-1 rounded-full h-10 bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700">
+                Iniciar
+              </button>
+            </div>
+          `;
+        } else if (showActions && validation.status === 'en_progreso') {
+          actionButtons = `
+            <div class="flex gap-2 pt-2">
+              <button onclick="completeValidation('${validation.id}')" class="flex-1 rounded-full h-10 bg-green-600 text-white font-semibold text-sm hover:bg-green-700">
+                Completar
+              </button>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="glass-card rounded-lg p-4 flex flex-col gap-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm font-medium text-primary">${typeLabel}</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400">Desde: ${startDate}</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400">Hasta: ${endDate}</p>
+                ${validation.validator?.nombre ? `<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Validador: ${validation.validator.nombre}</p>` : ''}
+              </div>
+              <div class="flex items-center gap-2 rounded-full ${status.bgClass} px-3 py-1 text-sm font-medium">
+                <span class="material-symbols-outlined text-base">${status.icon}</span>
+                <span>${status.label}</span>
+              </div>
+            </div>
+            ${validation.notes ? `<p class="text-sm text-slate-600 dark:text-slate-400"><strong>Notas:</strong> ${validation.notes}</p>` : ''}
+            ${actionButtons}
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    // Iniciar validación
+    async function startValidation(validationId) {
+      try {
+        await window.validacionesManager.startValidation(validationId);
+        alert('✅ Validación iniciada');
+        await loadStats();
+        await loadPendingValidations();
+        await loadHistoryValidations();
+      } catch (error) {
+        console.error('❌ Error iniciando validación:', error);
+        alert('Error al iniciar la validación');
+      }
+    }
+
+    // Completar validación
+    async function completeValidation(validationId) {
+      const notes = prompt('Notas finales (opcional):');
+      try {
+        await window.validacionesManager.completeValidation(validationId, notes);
+        alert('✅ Validación completada');
+        await loadStats();
+        await loadPendingValidations();
+        await loadHistoryValidations();
+      } catch (error) {
+        console.error('❌ Error completando validación:', error);
+        alert('Error al completar la validación');
+      }
+    }
+
+    // Cambiar vista
+    function toggleView(view) {
+      if (view === 'pendientes') {
+        document.getElementById('view-pendientes').classList.remove('hidden');
+        document.getElementById('view-historial').classList.add('hidden');
+      } else {
+        document.getElementById('view-pendientes').classList.add('hidden');
+        document.getElementById('view-historial').classList.remove('hidden');
+      }
+    }
+
+    // Formatear fecha
+    function formatDate(dateStr) {
+      const date = new Date(dateStr + 'T00:00:00');
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    // Inicializar
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  </script>
+</body>
+</html>
